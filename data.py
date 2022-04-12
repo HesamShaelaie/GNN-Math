@@ -1,9 +1,11 @@
+from ctypes import sizeof
 import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
 import pylab
 
 LIMIT_ITR = 10000
+
 class CreateData:
 
     def __init__(self, N, D1, D2, Srow, Fraction):
@@ -12,6 +14,9 @@ class CreateData:
         self.d2 = D2
         self.sr = Srow
         self.fr = Fraction
+        self.AXT = np.empty
+        self.AXTR = np.empty
+        self.nedge = N**2
 
     def show_par(self):
         print(self.n)
@@ -46,14 +51,20 @@ class CreateData:
             for j in range(i + 1, self.n):
                 UpCnt = UpCnt + 1
 
+        Tmp_test = ((self.n ** 2) - self.n)/2
+
+        if UpCnt != Tmp_test:
+            raise Exception("Something really messed up here!!")
+        
 
         self.X = np.random.uniform(0,1, size=(self.n, self.d1))
         self.Theta = np.random.uniform(0,1, size=(self.d1, self.d2))
+
         Lmt = int(UpCnt *(1-self.fr))
 
         DwCnt = 0 
         Limit_itr = 0
-        while(DwCnt < Lmt and Limit_itr<LIMIT_ITR):
+        while(DwCnt < Lmt and Limit_itr < LIMIT_ITR):
 
             x = 0
             y = 0
@@ -62,18 +73,27 @@ class CreateData:
 
                 Limit_itr = Limit_itr + 1
 
-                x = np.random.randint(0,self.n)
-                y = np.random.randint(0,self.n)
+                x = np.random.randint(0, self.n)
+                y = np.random.randint(0, self.n)
                 
                 if x == y or self.A[x][y] == 0:
                     continue
                 
                 self.A[x][y] = 0
                 self.A[y][x] = 0
+                self.nedge = self.nedge - 2 
+                # ======================================================
+                # check if it is still connected or not
+                # ======================================================
+
+                # we want to see if we through away x-y edge then the x will be disconnected or not
+                # we can access to all nodes with absence of the x-y even going from x to y we will undo the change
+                # we are only checking the access of x to other nodes why only x to all other nodes??
+                # because the graph was connected before and we are just throwing away x-y edge
 
                 visited = [False] * self.n
                 self.DFS(x, visited)
-                for b in visited:
+                for b in visited: #if only one member is disconnected we undo the change
                     if not b:
                         self.A[x][y] = 1
                         self.A[y][x] = 1
@@ -88,7 +108,7 @@ class CreateData:
 
         # mark current node as visited
         visited[v] = True
-    
+        
         # do for every edge (v, u)
         for u in range(self.n):
             if self.A[v][u] == 1:
@@ -128,15 +148,51 @@ class CreateData:
         pos = nx.spring_layout(G, k=0.15, iterations=2)
         nx.draw(G, pos)
         pylab.show() 
+    
+
+    def DoTheMath(self):
+
+        self.AA = self.A @ self.A           # n-n . n-n = n by n
+        self.AAX = self.AA @ self.X         #n-n . n-d1 = n by d1
+        self.AAXT= self.AAX @ self.Theta    #n-d1 . d1-d2 = n by d2
+        self.AAXTR = self.AAXT[self.sr,:]   #row of n-d2 = 1 by d2
+        self.XT = self.X @ self.Theta       #n-d1 . d1-d2 = n by d2
+        self.XTW = self.XT @ self.AAXTR.transpose() # n-d2 . d2-1 = n-1
         
+        
+        if self.sr >= self.n or self.sr < 0:
+            raise Exception("selected row is not in the range")
+        return self.AXTR
+    
+
+    def getSizes(self):
+        print("%-20s %-15s"%("size of A:   ", self.A.shape))
+        print("%-20s %-15s"%("size of X:   ", self.X.shape))
+        print("%-20s %-15s"%("size of Theta:   ", self.Theta.shape))
+        print("%-20s %-15s"%("size of AA:   ", self.AA.shape))
+        print("%-20s %-15s"%("size of AAX:   ", self.AAX.shape))
+        print("%-20s %-15s"%("size of AAXT:   ", self.AAXT.shape))
+        print("%-20s %-15s"%("size of XT:   ", self.XT.shape))
+        print("%-20s %-15s"%("size of AAXTR:   ", self.AAXTR.shape))
+        print("%-20s %-15s"%("size of XTW:   ", self.XTW.shape))
+        
+##  testing part
+##  testing part
+##  testing part
 
 if __name__ == '__main__':
 
-    tt = CreateData(20, 11, 12, 13, 0.3)
+    # Fraction = How much to be
+    # 1- Fraction -> how much to reduce
+
+    tt = CreateData(N=20, D1=11, D2=12, Srow=13, Fraction=0.3)
     tt.Generate_Random_v2()
-    tt.printA()
-    tt.check()
-    tt.draw_network()
+    tt.DoTheMath()
+    tt.getSizes()
+    print(tt.XTW[10,0])
 
-
-
+    #print(tt.AXTR)
+    #print(tt.AXTR)
+    #tt.printA()
+    #tt.check()
+    #tt.draw_network()

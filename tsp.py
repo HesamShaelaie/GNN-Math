@@ -1,6 +1,6 @@
 #!/usr/bin/env python3.7
 
-# Copyright 2021, Gurobi Optimization, LLC
+# Copyright 2022, Gurobi Optimization, LLC
 
 # Solve a traveling salesman problem on a randomly generated set of
 # points using lazy constraints.   The base MIP model only includes
@@ -20,20 +20,22 @@ from gurobipy import GRB
 # Callback - use lazy constraints to eliminate sub-tours
 def subtourelim(model, where):
     if where == GRB.Callback.MIPSOL:
-        # make a list of edges selected in the solution
         vals = model.cbGetSolution(model._vars)
-        selected = gp.tuplelist((i, j) for i, j in model._vars.keys()
-                                if vals[i, j] > 0.5)
         # find the shortest cycle in the selected edge list
-        tour = subtour(selected)
+        tour = subtour(vals)
         if len(tour) < n:
             # add subtour elimination constr. for every pair of cities in tour
-            model.cbLazy(gp.quicksum(model._vars[i, j] for i, j in combinations(tour, 2))<= len(tour)-1)
+            model.cbLazy(gp.quicksum(model._vars[i, j]
+                                     for i, j in combinations(tour, 2))
+                         <= len(tour)-1)
 
 
 # Given a tuplelist of edges, find the shortest subtour
 
-def subtour(edges):
+def subtour(vals):
+    # make a list of edges selected in the solution
+    edges = gp.tuplelist((i, j) for i, j in vals.keys()
+                         if vals[i, j] > 0.5)
     unvisited = list(range(n))
     cycle = range(n+1)  # initial length has 1 more city
     while unvisited:  # true if list is non-empty
@@ -68,6 +70,13 @@ dist = {(i, j):
         math.sqrt(sum((points[i][k]-points[j][k])**2 for k in range(2)))
         for i in range(n) for j in range(i)}
 
+print(dist)
+
+#for i in range(n) for j in range(i)
+#for i in range(n) for j in range(i)
+#for i in range(n) for j in range(i)
+#for i in range(n) for j in range(i)
+
 m = gp.Model()
 
 # Create variables
@@ -99,16 +108,14 @@ m.addConstrs(vars.sum(i, '*') == 2 for i in range(n))
 # Optimize model
 
 m._vars = vars
-m.Params.lazyConstraints = 1
+m.Params.LazyConstraints = 1
 m.optimize(subtourelim)
 
-vals = m.getAttr('x', vars)
-selected = gp.tuplelist((i, j) for i, j in vals.keys() if vals[i, j] > 0.5)
-
-tour = subtour(selected)
+vals = m.getAttr('X', vars)
+tour = subtour(vals)
 assert len(tour) == n
 
 print('')
 print('Optimal tour: %s' % str(tour))
-print('Optimal cost: %g' % m.objVal)
+print('Optimal cost: %g' % m.ObjVal)
 print('')
