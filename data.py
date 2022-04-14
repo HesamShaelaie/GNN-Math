@@ -3,12 +3,13 @@ import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
 import pylab
+import os
 
 LIMIT_ITR = 10000
 
 class CreateData:
 
-    def __init__(self, N, D1, D2, Srow, Fraction):
+    def __init__(self, N, D1, D2, Srow, Fraction, FSub=-1):
         self.n = N
         self.d1 = D1
         self.d2 = D2
@@ -17,7 +18,7 @@ class CreateData:
         self.AXT = np.empty
         self.AXTR = np.empty
         self.nedge = N**2
-
+        self.FSub = FSub
     def show_par(self):
         print(self.n)
         print(self.d1)
@@ -158,14 +159,23 @@ class CreateData:
         self.AAXTR = self.AAXT[self.sr,:]   #row of n-d2 = 1 by d2
         self.XT = self.X @ self.Theta       #n-d1 . d1-d2 = n by d2
         self.XTW = self.XT @ self.AAXTR.transpose() # n-d2 . d2-1 = n-1
-        
+        self.Lmt = int(self.nedge * self.FSub)
         
         if self.sr >= self.n or self.sr < 0:
             raise Exception("selected row is not in the range")
         return self.AXTR
     
 
-    def getSizes(self):
+    def getInfo(self):
+        os.system('clear')
+        print("===============================================")
+        print("===============================================")
+
+        print("%-20s %-15s"%("Number nodes:   ", self.n))
+        print("%-20s %-15s"%("Number edges:   ", self.nedge))
+        print("%-20s %-15s"%("Target edges:   ", self.Lmt))
+
+        print("=======   Detailed Info  ======================")
         print("%-20s %-15s"%("size of A:   ", self.A.shape))
         print("%-20s %-15s"%("size of X:   ", self.X.shape))
         print("%-20s %-15s"%("size of Theta:   ", self.Theta.shape))
@@ -175,7 +185,9 @@ class CreateData:
         print("%-20s %-15s"%("size of XT:   ", self.XT.shape))
         print("%-20s %-15s"%("size of AAXTR:   ", self.AAXTR.shape))
         print("%-20s %-15s"%("size of XTW:   ", self.XTW.shape))
-        
+        print("===============================================")
+        print("===============================================")
+        print("===============================================")
 ##  testing part
 ##  testing part
 ##  testing part

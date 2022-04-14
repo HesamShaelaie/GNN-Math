@@ -3,15 +3,16 @@ import scipy.sparse as sp
 import gurobipy as gp
 from gurobipy import GRB
 from data import CreateData
+import os
 
 
 np.random.seed(2021)
 
-N = 10 #matrix n by n
+N = 20 #matrix n by n
 D1 = 5      #matrix n by d1
 D2 = 6      #matrix d1 by d2
 Srow = 3    #selected row
-Frac = 0.9 
+Frac = 0.5 
 FSub = 0.2
 
 def IndexMaker(Size, x, y):
@@ -120,10 +121,13 @@ def subtourX(vals):
 
     return visited
 
-testdata = CreateData(N, D1, D2, Srow, Frac)
+testdata = CreateData(N, D1, D2, Srow, Frac, FSub)
 testdata.Generate_Random_v2()
 testdata.DoTheMath()
+testdata.getInfo()
 
+
+input("Press Enter to continue...")
 
 try:
 
