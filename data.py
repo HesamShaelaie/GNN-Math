@@ -205,11 +205,12 @@ class CreateData:
         print("===============================================")
     def dump_pickle(self, address):
         out = open(address,'wb')
-        tmp_dic = {'A':self.A, 'X':self.X , 'T':self.Theta, 'R': self.sr}
+        tmp_dic = {'A':self.A, 'X':self.X , 'T':self.Theta, 'R': self.sr, 'C':self.Lmt}
         #pickle.dump(self.A, out)
         #pickle.dump(self.X, out)
         #pickle.dump(self.Theta, out)
         pickle.dump(tmp_dic, out)
+        out.close()
 
 
 

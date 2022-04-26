@@ -29,3 +29,20 @@ Namespace(N=20, D1=12, D2=14, SR=5, Fr=0.4, Cn=0.3, TI=5)
 
 Press y to continue and any other key to exit!
 ```
+
+You can get use the help to description of each arg:
+```
+>> python data.py -h
+```
+
+You will find the generated data in the folder "GNNINPUT". Input data are named by has increasing integer values but you can find detail information of each file in the "GeneralInfo.txt".
+
+Content of each pickle is a dictionary with keys of
+
+| Variable | Description | Size |
+| :---: | :-: | :-: |
+| A |  Adjacency matrix with | n by n | 
+| X | Feature matrix | n by d1 |
+| T | Converting matrix | d1 by d2 |
+| R | Selected node | 1 by 1 |
+| L | Upper bound on number of edges | 1 by 1 |
