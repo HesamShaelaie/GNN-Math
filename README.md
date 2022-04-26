@@ -37,7 +37,7 @@ You will find the generated data in the folder "GNNINPUT". Input data are named 
 
 Content of each pickle is a dictionary with keys of
 
-| Variable | Description | Size |
+| Key | Description | Size |
 | :---: | :-: | :-: |
 | A |  Adjacency matrix | n by n | 
 | X | Feature matrix | n by d1 |
