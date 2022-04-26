@@ -17,5 +17,15 @@ In order to create data you just need to run data.py with the default values in 
 You can change default values by the following command:
 ```
 >> python data.py -tn 20 -d1 12 -d2 14 -sr 5 -f1 0.4 -f2 0.5 -ti 5
+```
 
+output:
+```
+=========================================================
+=========================================================
+Namespace(N=20, D1=12, D2=14, SR=5, Fr=0.4, Cn=0.3, TI=5)
+=========================================================
+=========================================================
+
+Press y to continue and any other key to exit!
 ```
