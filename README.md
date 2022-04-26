@@ -33,8 +33,7 @@ You can use the help to get brief information on each arg:
 ```
 >> python3 data.py -h
 ```
-
-You will find the generated data in the folder "GNNINPUT". Input data are named by has increasing integer values but you can find detail information of each file in the "GeneralInfo.txt".
+You will find the generated data in the folder "GNNINPUT". Input data are named by increasing integer values, but you can find detailed information on each file in the "GeneralInfo.txt".
 
 Content of each pickle is a dictionary with keys of
 
