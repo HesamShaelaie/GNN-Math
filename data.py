@@ -4,6 +4,21 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import pylab
 import os
+import pickle
+import sys
+
+
+
+from datetime import datetime
+
+
+now = datetime.now()
+ 
+print("now =", now)
+
+# dd/mm/YY H:M:S
+dt_string = now.strftime("%d-%m-%Y-%H-%M-%S")
+print("date and time =", dt_string)	
 
 LIMIT_ITR = 10000
 
@@ -188,20 +203,60 @@ class CreateData:
         print("===============================================")
         print("===============================================")
         print("===============================================")
+    def dump_pickle(self, address):
+        out = open(address,'wb')
+        tmp_dic = {'A':self.A, 'X':self.X , 'T':self.Theta}
+        #pickle.dump(self.A, out)
+        #pickle.dump(self.X, out)
+        #pickle.dump(self.Theta, out)
+        pickle.dump(tmp_dic, out)
+
+
+
+        
+
 ##  testing part
 ##  testing part
 ##  testing part
+
+
+from arg_pars import ParseArguments
+from CreatFile import CreateAdressParseArguments
 
 if __name__ == '__main__':
 
-    # Fraction = How much to be
-    # 1- Fraction -> how much to reduce
+    # default values
+    # to get info about eachone run the code and put -h argument as input to the algorithm
+    # you will see all the required information
 
-    tt = CreateData(N=20, D1=11, D2=12, Srow=13, Fraction=0.3)
-    tt.Generate_Random_v2()
-    tt.DoTheMath()
-    tt.getSizes()
-    print(tt.XTW[10,0])
+    N = 10
+    D1 = 3
+    D2 = 4
+    Srow = 2
+    Fraction = 0.6
+    Condition = 0.5
+    TInstance = 10
+
+    args = ParseArguments(N, D1, D2, Srow, Fraction, Condition, TInstance)
+    
+    N = args.N
+    D1 = args.D1
+    D2 = args.D2
+    Srow = args.SR
+    Fraction = args.Fr
+    Condition = args.Cn
+    TInstance = args.TI
+    
+    
+    for Cnt in range(TInstance):
+        
+        name , address = CreateAdressParseArguments(N=N, D1= D1, D2=D2, Srow=Srow, Fraction= Fraction, FSub=Condition)
+        tt = CreateData(N=N, D1= D1, D2=D2, Srow=Srow, Fraction= Fraction, FSub=Condition)
+        tt.Generate_Random_v2()
+        tt.DoTheMath()
+        tt.dump_pickle(address)
+        print("#(%d) file %d is done!"%(Cnt, name))
+        del tt
 
     #print(tt.AXTR)
     #print(tt.AXTR)

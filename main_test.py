@@ -6,19 +6,30 @@ from data import CreateData
 import os
 
 
-np.random.seed(2021)
+# You must set the parameter LazyConstraint=1. Otherwise, Gurobi might apply dual presolve reductions that are not valid for the lazy constraints.
+# Larger values for this attribute cause the constraint to be pulled into the model more aggressively. 
+# With a value of 1, the constraint can be used to cut off a feasible solution, but it won't necessarily be pulled in if another lazy constraint also cuts off the solution.
+# With a value of 2, all lazy constraints that are violated by a feasible solution will be pulled into the model.
+# With a value of 3, lazy constraints that cut off the relaxation solution at the root node are also pulled in.
 
-N = 20 #matrix n by n
+
+#np.random.seed(2021)
+
+N = 60 #matrix n by n
 D1 = 5      #matrix n by d1
 D2 = 6      #matrix d1 by d2
 Srow = 3    #selected row
 Frac = 0.5 
-FSub = 0.2
+FSub = 0.5
 
 def IndexMaker(Size, x, y):
-    return [(x,i,i,y) for i in range(Size)]
+    return [(x,i,i,y) for i in range(Size)] 
 
 
+# Code to Measure time taken by program to execute.
+import time
+
+  
 # Callback - use lazy constraints to eliminate sub-tours
 def subtourelim(model, where):
     if where == GRB.Callback.MIPSOL:                                            #???????
@@ -171,11 +182,17 @@ try:
     
     m.addConstr(gp.quicksum(x[i,j] for i in range(N) for j in range(N)) <= Lmt)
 
+    # store starting time
+    begin = time.time()
     #m._vars = x
     m.Params.LazyConstraints = 1
     m._var = x
     m.optimize(subtourelim)
 
+    end = time.time()
+    print("===============================")
+    print("===============================")
+    print("===============================")
     print(x.X)
     print("===============================")
     print("===============================")
@@ -192,7 +209,7 @@ try:
 
     Visited = subtourX(test_x)
     print(Visited)
-
+    print(f"Total runtime of the program is {end - begin}")
 
     #print(test_x)
 
