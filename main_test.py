@@ -5,7 +5,6 @@ from gurobipy import GRB
 from data import CreateData
 import os
 
-
 # You must set the parameter LazyConstraint=1. Otherwise, Gurobi might apply dual presolve reductions that are not valid for the lazy constraints.
 # Larger values for this attribute cause the constraint to be pulled into the model more aggressively. 
 # With a value of 1, the constraint can be used to cut off a feasible solution, but it won't necessarily be pulled in if another lazy constraint also cuts off the solution.
@@ -13,9 +12,9 @@ import os
 # With a value of 3, lazy constraints that cut off the relaxation solution at the root node are also pulled in.
 
 
-#np.random.seed(2021)
+np.random.seed(2021)
 
-N = 60 #matrix n by n
+N = 20 #matrix n by n
 D1 = 5      #matrix n by d1
 D2 = 6      #matrix d1 by d2
 Srow = 3    #selected row
@@ -29,14 +28,13 @@ def IndexMaker(Size, x, y):
 # Code to Measure time taken by program to execute.
 import time
 
-  
 # Callback - use lazy constraints to eliminate sub-tours
 def subtourelim(model, where):
     if where == GRB.Callback.MIPSOL:                                            #???????
         vals = model.cbGetSolution(model._var)
         # find the shortest cycle in the selected edge list
-        #n = len(vals[0,:].X)
-        n = testdata.n
+        n = len(vals[0,:])
+        #n = testdata.n
         SubGraph = subtour(vals)
         #
         Cnt = 0
@@ -55,10 +53,8 @@ def subtourelim(model, where):
 
             for x in YesVisited:
                 for y in NoVisited:
-                    if testdata.A[x,y] > 0.5:
-                        #print("%d->%d"%(x,y))
-                        tmp.add(model._var[x, y])
-            
+                    tmp.add(model._var[x, y])
+
             model.cbLazy(tmp >= 1)
 
 

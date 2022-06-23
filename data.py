@@ -7,10 +7,7 @@ import os
 import pickle
 import sys
 
-
-
 from datetime import datetime
-
 
 now = datetime.now()
  
@@ -20,7 +17,7 @@ print("now =", now)
 dt_string = now.strftime("%d-%m-%Y-%H-%M-%S")
 print("date and time =", dt_string)	
 
-LIMIT_ITR = 10000
+LIMIT_ITR = 10000000
 
 class CreateData:
 
@@ -32,7 +29,7 @@ class CreateData:
         self.fr = Fraction
         self.AXT = np.empty
         self.AXTR = np.empty
-        self.nedge = N**2
+        self.nedge = N*(N-1)
         self.FSub = FSub
     def show_par(self):
         print(self.n)
@@ -57,7 +54,7 @@ class CreateData:
 
     def Generate_Random_v2(self):
 
-        self.A = np.full((self.n, self.n), 1)
+        self.A = np.full((self.n, self.n), 1, dtype = np.bool_)
         UpCnt = 0
 
         for i in range(self.n):
@@ -69,17 +66,18 @@ class CreateData:
 
         Tmp_test = ((self.n ** 2) - self.n)/2
 
-        if UpCnt != Tmp_test:
-            raise Exception("Something really messed up here!!")
+        if UpCnt != Tmp_test or (Tmp_test*2)!= self.nedge:
+            raise Exception("UpCnt != Tmp_test or (Tmp_test*2)!= self.nedge")
         
 
         self.X = np.random.uniform(0,1, size=(self.n, self.d1))
         self.Theta = np.random.uniform(0,1, size=(self.d1, self.d2))
 
-        Lmt = int(UpCnt *(1-self.fr))
+        Lmt = int(UpCnt *(1-self.fr)) # we should delete this number
 
         DwCnt = 0 
         Limit_itr = 0
+
         while(DwCnt < Lmt and Limit_itr < LIMIT_ITR):
 
             x = 0
@@ -107,20 +105,21 @@ class CreateData:
                 # we are only checking the access of x to other nodes why only x to all other nodes??
                 # because the graph was connected before and we are just throwing away x-y edge
 
-                visited = [False] * self.n
-                self.DFS(x, visited)
+                visited = np.full(self.n, 0, dtype = np.bool_)
+                self.DFS_Nonrecursive(x, visited)
                 for b in visited: #if only one member is disconnected we undo the change
                     if not b:
                         self.A[x][y] = 1
                         self.A[y][x] = 1
-                        continue
-
-                DwCnt = DwCnt + 1
-                break
+                        break
+                
+                if self.A[x][y] == 0:
+                    DwCnt = DwCnt + 1
+                    break
 
         
 
-    def DFS(self, v, visited):
+    def DFS_recursive(self, v, visited):
 
         # mark current node as visited
         visited[v] = True
@@ -129,7 +128,27 @@ class CreateData:
         for u in range(self.n):
             if self.A[v][u] == 1:
                 if not visited[u]:
-                    self.DFS(u, visited)
+                    self.DFS_recursive(u, visited)
+
+    def DFS_Nonrecursive(self, v, visited):
+
+        # Mark current node as visited
+        
+        
+        Clist = np.zeros(self.n, dtype=np.int16)
+        Clist[0] = v
+        cnt = 1
+
+        while cnt > 0:
+            v = Clist[cnt-1]
+            cnt = cnt - 1 
+        # do for every edge (v, u)
+            for u in range(self.n):
+                if self.A[v][u] == 1:
+                    if not visited[u]:
+                        Clist[cnt] = u
+                        cnt = cnt + 1
+                        visited[u] = True
     
     def printA(self):
         for i in range(self.n):
@@ -212,14 +231,12 @@ class CreateData:
         pickle.dump(tmp_dic, out)
         out.close()
 
-
 ##  testing part
 ##  testing part
 ##  testing part
 
-
-from arg_pars import ParseArguments
-from CreatFile import CreateAdressParseArguments
+from arg_parse import ParseArguments
+from create_file import CreateAdressParseArguments
 
 if __name__ == '__main__':
 
@@ -245,10 +262,9 @@ if __name__ == '__main__':
     Condition = args.Cn
     TInstance = args.TI
     
-    
     for Cnt in range(TInstance):
         
-        name , address = CreateAdressParseArguments(N=N, D1= D1, D2=D2, Srow=Srow, Fraction= Fraction, FSub=Condition)
+        name , address = CreateAdressParseArguments(N=N, D1=D1, D2=D2, Srow=Srow, Fraction= Fraction, FSub=Condition)
         tt = CreateData(N=N, D1= D1, D2=D2, Srow=Srow, Fraction= Fraction, FSub=Condition)
         tt.Generate_Random_v2()
         tt.DoTheMath()

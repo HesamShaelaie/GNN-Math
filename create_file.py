@@ -34,9 +34,6 @@ def CreateAdressParseArguments(N, D1, D2, Srow, Fraction, FSub):
     out.write("%4d  %s     N<-%4d D1<-%4d  D2<-%4d SR<-%4d Fr <-%.2f Cn <-%.2f\n"%(LastFileNumber, dt_string, N, D1, D2, Srow, Fraction, FSub))
     out.close()
     return LastFileNumber, "%s/%d.txt"%(GNNINPUT ,LastFileNumber)
-    
-    
-
 
 if __name__ == '__main__':
 
@@ -46,7 +43,6 @@ if __name__ == '__main__':
     Srow = 3
     Fraction = 0.5
     Condition = 0.5
-    
 
     LF = CreateAdressParseArguments(N, D1, D2, Srow, Fraction, Condition)
 

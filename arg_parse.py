@@ -55,9 +55,6 @@ def ParseArguments(N, D1, D2, Srow, Fr, Cn, TI):
     else:
         exit(23)
 
-    
-    
-
 if __name__ == '__main__':
     
     N = 20

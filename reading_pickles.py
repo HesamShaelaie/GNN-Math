@@ -1,14 +1,16 @@
 import pickle
 import os 
-
-CurrectFolder = os.getcwd()
-GNNINPUT = CurrectFolder + "/GNNINPUT/"
+from data_structures import InputStructure
 
 
-for x in range(15,16):
+def read_data(Index):
+    
+    CurrectFolder = os.path.dirname(os.path.abspath(__file__))
+    GNNINPUT = CurrectFolder + "/GNNINPUT/"
 
-    print("reading the file %d!!"%(x))
-    path_to_file = "%s%d.txt"%(GNNINPUT,x)
+    print("reading the file %d!!"%(Index))
+    Fname = "%d.txt"%(Index)
+    path_to_file = "%s%d.txt"%(GNNINPUT, Index)
     Fresult= os.path.exists(path_to_file)
 
     if Fresult == False:
@@ -20,14 +22,20 @@ for x in range(15,16):
         except EOFError:
             raise Exception("cannot read the content!!")
         f.close()
+
     A = Info['A']
     X = Info['X']
     T = Info['T']
     R = Info['R']
     L = Info['L']
 
-    #print(A[1:4,1:4])
-    #print(L)
+    InputDt = InputStructure(Index, path_to_file, Fname, A, X, T, R, L)
+
+    return InputDt
+
+if __name__ == '__main__':
+    InputDt = read_data(15)
+    InputDt.show()
 
 
         
