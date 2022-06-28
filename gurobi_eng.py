@@ -17,7 +17,7 @@ def Gurobi_Solve(InputData: InputStructure):
         Lmt = InputData.Lmt
 
         #Data result
-        OutData = OutputStructure
+        OutData = OutputStructure()
 
         # Create a new model
         m = gp.Model("quadratic")
@@ -36,7 +36,7 @@ def Gurobi_Solve(InputData: InputStructure):
                 obj.add(InputData.XTW[Pindex]*x[i1,j1]*x[i2,j2])
 
         # Geting the number of quadratic term in objective function
-        OutData.SetNumberQ(obj.size())
+        OutData.NQ =obj.size()
 
         m.setObjective(obj , GRB.MAXIMIZE)
         m.params.NonConvex = 2
@@ -67,17 +67,18 @@ def Gurobi_Solve(InputData: InputStructure):
         m.optimize(subtourelim)
         end = time.time()
 
-        OutData.SetTime(end-begin)
-        OutData.SetX(x.X)
-        OutData.SetObj(m.objVal)
+        OutData.Time = end-begin
+        OutData.X = x.X
+        OutData.Obj = m.objVal
         
         # testing the solution
         test_x = x.X
-        Visited = subtour(test_x)
+        Visited = subtour(test_x, InputData.n)
         for x in Visited:
             if not x:
                 print("Solution is not valid!!")
-
+        print(OutData.Time)
+        return OutData
         
     except gp.GurobiError as e:
         print('Error code ' + str(e.errno) + ": " + str(e))
@@ -173,7 +174,7 @@ def subtour(vals, n):
     if i == -1:
         return visited
 
-    DFS(vals, i, visited)
+    DFS_Nonrecursive(vals, n, i, visited)
 
     return visited
 

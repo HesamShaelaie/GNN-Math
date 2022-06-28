@@ -2,7 +2,7 @@ import numpy as np
 
 
 class InputStructure():
-    def __init__(self,Index, A,X,T,R,L) -> None:
+    def __init__(self,Index,Path, Fname, A,X,T,R,L) -> None:
         self.Index = Index
         self.n = len(A[0,:])
         self.A = A
@@ -10,7 +10,19 @@ class InputStructure():
         self.Theta = T
         self.sr = R
         self.Lmt = L
+        self.DenA = 0.0
+        self.Path = Path
+        self.Fname = Fname
+        for x in range(self.n):
+            for y in range(self.n):
+                if self.A[x,y]>0.5:
+                    self.DenA = self.DenA + 1
 
+        if self.DenA%2 != 0:
+            print("Input A matrix has problem!")
+            exit(3)
+        
+        self.DenA = self.DenA/self.n**2 
         self.AA = self.A @ self.A           # n-n . n-n = n by n
         self.AAX = self.AA @ self.X         #n-n . n-d1 = n by d1
         self.AAXT= self.AAX @ self.Theta    #n-d1 . d1-d2 = n by d2
@@ -35,6 +47,12 @@ class InputStructure():
 
 class OutputStructure():
     
+    def __init__(self) -> None:
+        self.NQ = 0
+        self.Obj =0.0
+        self.X = any
+        self.Time =0.0
+
     def SetNumberQ(self, tmp: np.int16):
         self.NQ = tmp
 
