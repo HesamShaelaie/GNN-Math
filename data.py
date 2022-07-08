@@ -31,6 +31,8 @@ class CreateData:
         self.AXTR = np.empty
         self.nedge = N*(N-1)
         self.FSub = FSub
+        self.Pos = np.empty
+
     def show_par(self):
         print(self.n)
         print(self.d1)
@@ -53,6 +55,9 @@ class CreateData:
         self.Theta = np.random.uniform(0,1, size=(self.d1, self.d2))
 
     def Generate_Random_v2(self):
+        
+        self.Pos = np.random.randint(0,2000, size=(self.n, 2))
+
 
         self.A = np.full((self.n, self.n), 1, dtype = np.bool_)
         UpCnt = 0
@@ -116,7 +121,7 @@ class CreateData:
                 if self.A[x][y] == 0:
                     DwCnt = DwCnt + 1
                     break
-
+    
         
 
     def DFS_recursive(self, v, visited):
@@ -133,7 +138,6 @@ class CreateData:
     def DFS_Nonrecursive(self, v, visited):
 
         # Mark current node as visited
-        
         
         Clist = np.zeros(self.n, dtype=np.int16)
         Clist[0] = v
@@ -224,7 +228,7 @@ class CreateData:
         print("===============================================")
     def dump_pickle(self, address):
         out = open(address,'wb')
-        tmp_dic = {'A':self.A, 'X':self.X , 'T':self.Theta, 'R': self.sr, 'L':self.Lmt}
+        tmp_dic = {'A':self.A, 'X':self.X , 'T':self.Theta, 'R': self.sr, 'L':self.Lmt, 'P':self.Pos}
         #pickle.dump(self.A, out)
         #pickle.dump(self.X, out)
         #pickle.dump(self.Theta, out)
@@ -244,11 +248,11 @@ if __name__ == '__main__':
     # to get info about eachone run the code and put -h argument as input to the algorithm
     # you will see all the required information
 
-    N = 10
+    N = 20
     D1 = 3
     D2 = 4
     Srow = 2
-    Fraction = 0.6
+    Fraction = 0.2
     Condition = 0.5
     TInstance = 10
 

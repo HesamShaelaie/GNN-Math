@@ -46,8 +46,6 @@ def Write_Result(Input: InputStructure, Output: OutputStructure):
             header = ['name', 'Time', 'Duration', 'Obj', '#Q', 'Size-A','Den-A','Lim','Size-X-x','Size-X-y', 'Size-T-x', 'Size-T-y', 'R']
             writer.writerow(header)
             
-    
-    
     # Pre-requisite - The CSV file should be manually closed before running this code.
     now = datetime.now()
     dt_string = now.strftime("%d-%m-%Y %H-%M-%S")
@@ -68,7 +66,4 @@ def Write_Result(Input: InputStructure, Output: OutputStructure):
     # create the file
     # put it there
     # close the file
-
-
     # details
-

@@ -2,7 +2,7 @@ import numpy as np
 
 
 class InputStructure():
-    def __init__(self,Index,Path, Fname, A,X,T,R,L) -> None:
+    def __init__(self,Index,Path, Fname, A,X,T,R,L,P) -> None:
         self.Index = Index
         self.n = len(A[0,:])
         self.A = A
@@ -13,6 +13,7 @@ class InputStructure():
         self.DenA = 0.0
         self.Path = Path
         self.Fname = Fname
+        self.Pos = P
         for x in range(self.n):
             for y in range(self.n):
                 if self.A[x,y]>0.5:

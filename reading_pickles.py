@@ -1,6 +1,7 @@
 import pickle
 import os 
 from data_structures import InputStructure
+from data_structures import OutputStructure
 
 
 def read_data(Index):
@@ -9,7 +10,7 @@ def read_data(Index):
     GNNINPUT = CurrectFolder + "/GNNINPUT/"
 
     print("reading the file %d!!"%(Index))
-    Fname = "%d.txt"%(Index)
+    Fname = "%d"%(Index)
     path_to_file = "%s%d.txt"%(GNNINPUT, Index)
     Fresult= os.path.exists(path_to_file)
 
@@ -28,8 +29,9 @@ def read_data(Index):
     T = Info['T']
     R = Info['R']
     L = Info['L']
+    P = Info['P']
 
-    InputDt = InputStructure(Index, path_to_file, Fname, A, X, T, R, L)
+    InputDt = InputStructure(Index, path_to_file, Fname, A, X, T, R, L, P)
 
     return InputDt
 
