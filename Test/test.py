@@ -1,8 +1,7 @@
 
-import osmnx as ox
 
+import networkx as nx
+import osmnx as ox
 import matplotlib.pyplot as plt
-g = ox.graph.graph_from_address("Bethelehem, PA")
-nx.draw(g)
-plt.show()
+ox.folium.plot_graph_folium(ox.graph_from_place('Bethlehem, PA, USA', network_type = 'drive')).save('Bethlehem.html') 
 

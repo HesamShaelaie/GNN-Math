@@ -54,7 +54,7 @@ def Draw_Picture(Input: InputStructure, Output: OutputStructure):
     
 
     node_colors= ["#232ab8","#de3737","#80d189","#80d189","#ccbfbe","#ccbfbe","#ccbfbe"]
-    node_sizes = [300,500,7000,9000,11000,13000,15000]
+    node_sizes = [30,50,7000,9000,11000,13000,15000]
     node_shapes = ['s', 'o']
 
 

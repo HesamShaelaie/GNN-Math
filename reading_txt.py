@@ -11,7 +11,6 @@ import os
 from data_structures import InputStructure
 from data_structures import OutputStructure
 
-
 positions = {}
 edgelistA = []
 with open('/Users/hesamshaelaie/Documents/Research/Delaunay-triangulation/Delaunay-triangulation/TInstance.txt') as f:
@@ -42,9 +41,9 @@ with open('/Users/hesamshaelaie/Documents/Research/Delaunay-triangulation/Delaun
         exit(12)
     
 
-    node_colors= ["#232ab8","#de3737","#80d189","#80d189","#ccbfbe","#ccbfbe","#ccbfbe"]
-    node_sizes = [30,50,7000,9000,11000,13000,15000]
-    node_shapes = ['s', 'o']
+node_colors= ["#232ab8","#de3737","#80d189","#80d189","#ccbfbe","#ccbfbe","#ccbfbe"]
+node_sizes = [30,50,7000,9000,11000,13000,15000]
+node_shapes = ['s', 'o']
 
 
 G = nx.Graph()

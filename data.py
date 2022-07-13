@@ -6,8 +6,9 @@ import pylab
 import os
 import pickle
 import sys
-
+import math
 from datetime import datetime
+import random
 
 now = datetime.now()
  
@@ -122,6 +123,164 @@ class CreateData:
                     DwCnt = DwCnt + 1
                     break
     
+
+    def Generate_Random_v3(self):
+        
+        numberPoints = self.n
+
+        Lw = 0
+        Hw = 800
+            
+        Lh = 0
+        Hh = 600
+
+        adjusting_space = 0.9
+        Limit_space = (float(Hw-Lw) * float(Hh-Lh)* adjusting_space)/numberPoints
+        Limit_distance = math.sqrt((Limit_space/3.14))
+            
+        MidW = (Lw + Hw)/2
+        MidH = (Lh + Hh)/2
+
+        itr = 0
+        itr_s = 0
+        itr_limit = 5000000
+
+        dist = -0.0
+        find = False
+        points = {}
+
+        while(itr < numberPoints and itr_s< itr_limit):
+
+            tmp_node = [random.uniform(Lw, Hw), random.uniform(Lh, Hh)]
+            find = False
+            for key, value in points.items():
+
+                x = (tmp_node[0]-value[0])**2
+                y = (tmp_node[1]-value[1])**2
+                z = x + y
+                dist = math.sqrt(z)
+
+                if (dist < Limit_distance):
+                    find = True
+                    break
+            
+            if (not find):
+                points.update({itr:tmp_node})
+                itr = itr +1 
+            
+            itr_s = itr_s + 1
+
+
+        if (itr_s == itr_limit):
+
+            print("cannot creat the instance!!")
+            exit(2)
+
+        tmp_pos = []
+        for x in range(self.n):
+            tmp_pos.append(points[x])
+
+        self.Pos = tmp_pos
+
+
+        from scipy.spatial import Delaunay
+        tri = Delaunay(tmp_pos)
+
+        #print(tri.simplices)
+
+        # finding the center 
+        min_k = -1
+        min_v = 999999999.0
+
+        for key, value in points.items():
+                
+            
+            x = (MidW-value[0])**2
+            y = (MidH-value[1])**2
+            z = x + y
+            dist = math.sqrt(z)
+            if (dist < min_v):
+                min_v = dist
+                min_k = key
+
+        
+        self.sr = min_k
+
+        # extracting the edges
+        edge_list = []
+        for tri in tri.simplices:
+            edge_list.append([tri[0], tri[1]])
+            edge_list.append([tri[1], tri[2]])
+            edge_list.append([tri[2], tri[0]])
+
+        self.A = np.full((self.n, self.n), 0, dtype = np.bool_)
+        for x in edge_list:
+            a = x[0]
+            b = x[1]
+            self.A[a][b] = 1
+            self.A[b][a] = 1
+
+        UpCnt = 0
+        for x in range(self.n):
+            for y in range(x,self.n):
+                UpCnt = UpCnt + 1
+
+
+        self.X = np.random.uniform(0,1, size=(self.n, self.d1))
+        self.Theta = np.random.uniform(0,1, size=(self.d1, self.d2))
+
+        Lmt = int(UpCnt *(1-self.fr)) # we should delete this number
+
+        DwCnt = 0 
+        Limit_itr = 0
+
+        while(DwCnt < Lmt and Limit_itr < LIMIT_ITR):
+
+            x = 0
+            y = 0
+
+            while (Limit_itr < LIMIT_ITR):
+
+                Limit_itr = Limit_itr + 1
+
+                x = np.random.randint(0, self.n)
+                y = np.random.randint(0, self.n)
+                
+                if x == y or self.A[x][y] == 0:
+                    continue
+                
+                self.A[x][y] = 0
+                self.A[y][x] = 0
+                self.nedge = self.nedge - 2
+
+                # ======================================================
+                # check if it is still connected or not
+                # ======================================================
+
+                # we want to see if we through away x-y edge then the x will be disconnected or not
+                # we can access to all nodes with absence of the x-y even going from x to y we will undo the change
+                # we are only checking the access of x to other nodes why only x to all other nodes??
+                # because the graph was connected before and we are just throwing away x-y edge
+
+                visited = np.full(self.n, 0, dtype = np.bool_)
+                self.DFS_Nonrecursive(x, visited)
+                for b in visited: #if only one member is disconnected we undo the change
+                    if not b:
+                        self.A[x][y] = 1
+                        self.A[y][x] = 1
+                        break
+                
+                if self.A[x][y] == 0:
+                    DwCnt = DwCnt + 1
+                    break
+
+    
+    def distance(A , B):
+
+        x = (A[0]-B[0])**2
+        y = (A[1]-B[1])**2
+        z = x + y
+        return math.sqrt(z)
         
 
     def DFS_recursive(self, v, visited):
@@ -248,12 +407,12 @@ if __name__ == '__main__':
     # to get info about eachone run the code and put -h argument as input to the algorithm
     # you will see all the required information
 
-    N = 20
+    N = 50
     D1 = 3
     D2 = 4
     Srow = 2
-    Fraction = 0.2
-    Condition = 0.5
+    Fraction = 1
+    Condition = 0.6
     TInstance = 10
 
     args = ParseArguments(N, D1, D2, Srow, Fraction, Condition, TInstance)
@@ -270,7 +429,7 @@ if __name__ == '__main__':
         
         name , address = CreateAdressParseArguments(N=N, D1=D1, D2=D2, Srow=Srow, Fraction= Fraction, FSub=Condition)
         tt = CreateData(N=N, D1= D1, D2=D2, Srow=Srow, Fraction= Fraction, FSub=Condition)
-        tt.Generate_Random_v2()
+        tt.Generate_Random_v3()
         tt.DoTheMath()
         tt.dump_pickle(address)
         print("#(%d) file %d is done!"%(Cnt, name))
