@@ -1,22 +1,8 @@
-#from re import X
 
+import osmnx as ox
 
-x = 10
-def TestingF(X):
-    Y = X
-    Y = 20
-    print(x)
-    print(y)
-    print(X)
-    print(Y)
+import matplotlib.pyplot as plt
+g = ox.graph.graph_from_address("Bethelehem, PA")
+nx.draw(g)
+plt.show()
 
-
-if __name__ == '__main__':
-    print(x)
-    y = x
-    y = 15 
-    print(x)
-    print(y)
-    TestingF(x)
-    print(x)
-    print(y)

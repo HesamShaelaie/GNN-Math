@@ -14,7 +14,7 @@ from data_structures import OutputStructure
 
 positions = {}
 edgelistA = []
-with open('/Users/hesamshaelaie/Documents/Research/others-code/testing/Testing-graph/Testing-graph/TInstance.txt') as f:
+with open('/Users/hesamshaelaie/Documents/Research/Delaunay-triangulation/Delaunay-triangulation/TInstance.txt') as f:
     nn = int(next(f))
     ne = int(next(f))
     print(nn)
@@ -33,7 +33,13 @@ with open('/Users/hesamshaelaie/Documents/Research/others-code/testing/Testing-g
         if tmp:
             edgelistA.append((int(tmp[0]),int(tmp[1])))
             rw = rw + 1
-    print(edgelistA)
+    
+    LenList = len(edgelistA)
+    LenSet = len(set(edgelistA))
+
+    if LenList != LenSet:
+        print("LenList != LenSet")
+        exit(12)
     
 
     node_colors= ["#232ab8","#de3737","#80d189","#80d189","#ccbfbe","#ccbfbe","#ccbfbe"]
@@ -49,10 +55,12 @@ for a,p in positions.items():
         G.nodes[a]['color'] = node_colors[1]
         G.nodes[a]['size'] = node_sizes[1]
         G.nodes[a]['shape'] = node_shapes[0]
+        G.nodes[a]['label'] = str(a)
     else:
         G.nodes[a]['color'] = node_colors[0]
         G.nodes[a]['size'] = node_sizes[0]
         G.nodes[a]['shape'] = node_shapes[1]
+        G.nodes[a]['label'] = str(a)
 
 
 G.add_edges_from(edgelistA)
@@ -67,7 +75,11 @@ for shape in set(node_shapes):
                         nodelist = node_list,
                         node_size = [G.nodes[node]['size'] for node in node_list],
                         node_color= [G.nodes[node]['color'] for node in node_list],
-                        node_shape = shape)
+                        node_shape = shape, 
+                        label = [G.nodes[node]['label'] for node in node_list]
+                        )
+
+    nx.draw_networkx_labels(G,positions, font_size=6)
 
 CurrectFolder = os.path.dirname(os.path.abspath(__file__))
 GNNPICOUT = CurrectFolder + "/GNNPICOUT"
