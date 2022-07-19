@@ -220,11 +220,13 @@ class CreateData:
             b = x[1]
             self.A[a][b] = 1
             self.A[b][a] = 1
+        
 
         UpCnt = 0
         for x in range(self.n):
             for y in range(x,self.n):
-                UpCnt = UpCnt + 1
+                if(self.A[x][y]>0.5):
+                    UpCnt = UpCnt + 1
         
 
         print("Counted the edge => done")
@@ -281,8 +283,12 @@ class CreateData:
                     print(",%d"%(DwCnt),end="",flush=True)
                     break
         
-        print("!!!",end="   ")
 
+        print("!!!",end="   ")
+        if Limit_itr == LIMIT_ITR:
+            print("")
+            print("error: Limit_itr == LIMIT_ITR!!!")
+            exit(123)
     
     def distance(A , B):
 
@@ -366,10 +372,17 @@ class CreateData:
         self.XT = self.X @ self.Theta       #n-d1 . d1-d2 = n by d2
         self.XTW = self.XT @ self.AAXTR.transpose() # n-d2 . d2-1 = n-1
         self.Lmt = int(self.nedge * self.FSub)
+
+        if  self.nedge < self.Lmt:
+            print("some problem in do the math!!")
+            exit(12)
+
         
+        print("#edge: %d - #Lmt: %d"%(self.nedge, self.Lmt))
         if self.sr >= self.n or self.sr < 0:
             raise Exception("selected row is not in the range")
-        return self.AXTR
+        return self.nedge, self.Lmt
+            
     
 
     def getInfo(self):
@@ -414,7 +427,7 @@ from create_file import CreateAdressParseArguments
 
 if __name__ == '__main__':
 
-    # default values
+    # Default values
     # to get info about eachone run the code and put -h argument as input to the algorithm
     # you will see all the required information
 
@@ -422,9 +435,9 @@ if __name__ == '__main__':
     D1 = 5
     D2 = 5
     Srow = 2
-    Fraction = 0.9        #it should be between zero and one
-    Condition = 0.9     #it should be between zero and one
-    TInstance = 10      #number of instances generated
+    Fraction  = 0.95        #it should be between zero and one
+    Condition = 1.0         #it should be between zero and one
+    TInstance = 10          #number of instances generated
 
     args = ParseArguments(N, D1, D2, Srow, Fraction, Condition, TInstance)
     
@@ -438,10 +451,12 @@ if __name__ == '__main__':
     
     for Cnt in range(TInstance):
         
-        name , address = CreateAdressParseArguments(N=N, D1=D1, D2=D2, Srow=Srow, Fraction= Fraction, FSub=Condition)
+        
         tt = CreateData(N=N, D1= D1, D2=D2, Srow=Srow, Fraction= Fraction, FSub=Condition)
         tt.Generate_Random_v3()
-        tt.DoTheMath()
+        Nedge, Nlimit = tt.DoTheMath()
+
+        name , address = CreateAdressParseArguments(N= N, D1= D1, D2= D2, Srow= Srow, Fraction= Fraction, FSub= Condition,Nedge=Nedge, Lmt= Nlimit)
         tt.dump_pickle(address)
         print("#(%d) file %d is done!"%(Cnt, name))
         del tt

@@ -2,7 +2,7 @@ import os
 import os.path
 from datetime import datetime
 
-def CreateAdressParseArguments(N, D1, D2, Srow, Fraction, FSub):
+def CreateAdressParseArguments(N, D1, D2, Srow, Fraction, FSub, Nedge, Lmt):
     CurrectFolder = os.getcwd()
     GNNINPUT = CurrectFolder + "/GNNINPUT"
 
@@ -31,7 +31,7 @@ def CreateAdressParseArguments(N, D1, D2, Srow, Fraction, FSub):
     #print("date and time =", dt_string)
 
     out = open(Add_general_info, "a")
-    out.write("%4d  %s     N<-%4d D1<-%4d  D2<-%4d SR<-%4d Fr <-%.2f Cn <-%.2f\n"%(LastFileNumber, dt_string, N, D1, D2, Srow, Fraction, FSub))
+    out.write("%4d  %s     N<-%4d D1<-%4d  D2<-%4d SR<-%4d Fr <-%.2f Cn <-%.2f edge  <- %d  Lim  <-  %d\n"%(LastFileNumber, dt_string, N, D1, D2, Srow, Fraction, FSub, Nedge, Lmt))
     out.close()
     return LastFileNumber, "%s/%d.txt"%(GNNINPUT ,LastFileNumber)
 

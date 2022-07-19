@@ -42,7 +42,7 @@ def read_data(Index):
     if cnt < L:
         print("something is wrong with input!!")
         exit(12)
-        
+
     InputDt = InputStructure(Index, path_to_file, Fname, A, X, T, R, L, P)
 
     return InputDt
