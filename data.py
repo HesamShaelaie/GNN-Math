@@ -18,7 +18,7 @@ print("now =", now)
 dt_string = now.strftime("%d-%m-%Y-%H-%M-%S")
 print("date and time =", dt_string)	
 
-LIMIT_ITR = 10000000
+LIMIT_ITR = 100000
 
 class CreateData:
 
@@ -182,12 +182,12 @@ class CreateData:
 
         self.Pos = tmp_pos
 
-
+        print("Positions => done")
         from scipy.spatial import Delaunay
         tri = Delaunay(tmp_pos)
-
+        print("Delaunay => done")
         #print(tri.simplices)
-
+        
         # finding the center 
         min_k = -1
         min_v = 999999999.0
@@ -203,7 +203,7 @@ class CreateData:
                 min_v = dist
                 min_k = key
 
-        
+        print("Found the row => done")        
         self.sr = min_k
 
         # extracting the edges
@@ -213,6 +213,7 @@ class CreateData:
             edge_list.append([tri[1], tri[2]])
             edge_list.append([tri[2], tri[0]])
 
+        print("Extract the edge => done")
         self.A = np.full((self.n, self.n), 0, dtype = np.bool_)
         for x in edge_list:
             a = x[0]
@@ -224,13 +225,17 @@ class CreateData:
         for x in range(self.n):
             for y in range(x,self.n):
                 UpCnt = UpCnt + 1
+        
 
+        print("Counted the edge => done")
         self.nedge = UpCnt
         self.X = np.random.uniform(0,1, size=(self.n, self.d1))
         self.Theta = np.random.uniform(0,1, size=(self.d1, self.d2))
 
-        Lmt = int(UpCnt *(1-self.fr)) # we should delete this number
+        print("Genrated the x theta => done")
 
+        Lmt = int(UpCnt *(1-self.fr)) # we should delete this number
+        print("Org #edge: %d and reduction is %d:"%(UpCnt, Lmt),end="    ",flush=True)
         DwCnt = 0 
         Limit_itr = 0
 
@@ -268,11 +273,15 @@ class CreateData:
                     if not b:
                         self.A[x][y] = 1
                         self.A[y][x] = 1
+                        self.nedge = self.nedge + 2
                         break
                 
                 if self.A[x][y] == 0:
                     DwCnt = DwCnt + 1
+                    print(",%d"%(DwCnt),end="",flush=True)
                     break
+        
+        print("!!!",end="   ")
 
     
     def distance(A , B):
@@ -413,7 +422,7 @@ if __name__ == '__main__':
     D1 = 5
     D2 = 5
     Srow = 2
-    Fraction = 1        #it should be between zero and one
+    Fraction = 0.9        #it should be between zero and one
     Condition = 0.9     #it should be between zero and one
     TInstance = 10      #number of instances generated
 
