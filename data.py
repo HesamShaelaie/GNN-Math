@@ -225,7 +225,7 @@ class CreateData:
             for y in range(x,self.n):
                 UpCnt = UpCnt + 1
 
-
+        self.nedge = UpCnt
         self.X = np.random.uniform(0,1, size=(self.n, self.d1))
         self.Theta = np.random.uniform(0,1, size=(self.d1, self.d2))
 
@@ -385,6 +385,8 @@ class CreateData:
         print("===============================================")
         print("===============================================")
         print("===============================================")
+
+        
     def dump_pickle(self, address):
         out = open(address,'wb')
         tmp_dic = {'A':self.A, 'X':self.X , 'T':self.Theta, 'R': self.sr, 'L':self.Lmt, 'P':self.Pos}
@@ -408,12 +410,12 @@ if __name__ == '__main__':
     # you will see all the required information
 
     N = 50
-    D1 = 3
-    D2 = 4
+    D1 = 5
+    D2 = 5
     Srow = 2
-    Fraction = 1
-    Condition = 0.6
-    TInstance = 10
+    Fraction = 1        #it should be between zero and one
+    Condition = 0.9     #it should be between zero and one
+    TInstance = 10      #number of instances generated
 
     args = ParseArguments(N, D1, D2, Srow, Fraction, Condition, TInstance)
     

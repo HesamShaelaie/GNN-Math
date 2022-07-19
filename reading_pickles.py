@@ -31,6 +31,18 @@ def read_data(Index):
     L = Info['L']
     P = Info['P']
 
+
+    n = len(A[0,:])
+    cnt = 0
+    for x in range(n):
+        for y in range(n):
+            if A[x,y]>0.5:
+                cnt = cnt + 1
+    
+    if cnt < L:
+        print("something is wrong with input!!")
+        exit(12)
+        
     InputDt = InputStructure(Index, path_to_file, Fname, A, X, T, R, L, P)
 
     return InputDt

@@ -7,8 +7,8 @@ from draw_graphs import Draw_Picture
 
 
 def RunMainFuntions():
-    St = 147
-    Ed = 155
+    St = 5000
+    Ed = 5034
     for x in range(St, Ed):
         InputDt = read_data(x)
 
