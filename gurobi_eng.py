@@ -7,8 +7,9 @@ from data import CreateData
 from data_structures import InputStructure
 from data_structures import OutputStructure
 import time
+from arg_parse import wait_key
 
-def Gurobi_Solve(InputData: InputStructure):
+def Gurobi_Solve(InputData: InputStructure, Lazy = True):
 
     try:
         #Data input
@@ -29,11 +30,17 @@ def Gurobi_Solve(InputData: InputStructure):
         obj = gp.QuadExpr()
         
         # Set quadratic part
+        cnt_negetive_trm = 0
         for Pindex in range(N):
             z = IndexMaker(N, Srow, Pindex)
 
             for i1,j1,i2,j2 in z:
                 obj.add(InputData.XTW[Pindex]*x[i1,j1]*x[i2,j2])
+
+            if InputData.XTW[Pindex] <= 0:
+                cnt_negetive_trm = cnt_negetive_trm + 1
+                print("We have negative/zero coefficient in objective function!!")
+                exit(3355)
 
         # Geting the number of quadratic term in objective function
         OutData.NQ =obj.size()
@@ -64,7 +71,10 @@ def Gurobi_Solve(InputData: InputStructure):
 
         # running the algorithm
         begin = time.time()
-        m.optimize(subtourelim)
+        if Lazy == True:
+            m.optimize(subtourelim)
+        else:
+            m.optimize()
         end = time.time()
 
         OutData.Time = end-begin

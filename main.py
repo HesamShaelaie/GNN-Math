@@ -7,12 +7,13 @@ from draw_graphs import Draw_Picture
 
 
 def RunMainFuntions():
+    
     St = 254
-    Ed = 269
+    Ed = 255
     for x in range(St, Ed):
         InputDt = read_data(x)
 
-        #InputDt.Lmt = int(InputDt.Lmt*0.1)
+        InputDt.Lmt = int(InputDt.Lmt*0.2)
 
         #InputDt.show()
         ResultDt = Gurobi_Solve(InputDt)
