@@ -129,8 +129,9 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure):
     ReEdge = np.copy(Input.A)
     for i in range(Input.n-1):
         for j in range(i+1, Input.n):
-            if Input.X[i][j] > 0.5:
+            if Output.X[i][j] > 0.5:
                 ReEdge[i,j] = 0
+                ReEdge[j,i] = 0
 
     # Color edge
     ALLNode = [x for x in range(Input.n)]
@@ -153,7 +154,7 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure):
     New_A = np.delete(New_A,NodeNotInList, 1)
 
     New_X = np.delete(Input.X,NodeNotInList, 0)
-    New_n = Input.n - len(NodeE)
+    New_n = Input.n - len(NodeNotInList)
     New_Lmt = 0
 
     for x in range(New_n):
