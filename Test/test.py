@@ -1,17 +1,11 @@
-import numpy as np
+NodeNotInList = [2 ,6]
+ALLNode = [x for x in range(10)]
 
-a = np.arange(12).reshape(3, 4)
-print(a)
-# [[ 0  1  2  3]
-#  [ 4  5  6  7]
-#  [ 8  9 10 11]]
-print()
-a_del = np.delete(a, (0,2), 0)
-print(a_del)
-# [[ 0  1  2  3]
-#  [ 8  9 10 11]]
-print()
-print(a)
-# [[ 0  1  2  3]
-#  [ 4  5  6  7]
-#  [ 8  9 10 11]]
+for t in NodeNotInList:
+    for y in range(10):
+        if t == y:
+            ALLNode[y] = -1
+        elif t < y:
+            ALLNode[y] = ALLNode[y]-1
+
+print(ALLNode)
