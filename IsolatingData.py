@@ -149,8 +149,15 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure):
             NewPositions.update({ALLNode[x]:Input.Pos[x]})
 
 
+    New_A = np.copy(Input.A)
+    for x in range(Input.n):
+        for y in range(Input.n):
+            if Output.X[x][y]>0.5:
+                New_A[x,y] = 1
+            else:
+                New_A[x,y] = 0
 
-    New_A = np.delete(Input.A,NodeNotInList, 0)
+    New_A = np.delete(New_A,NodeNotInList, 0)
     New_A = np.delete(New_A,NodeNotInList, 1)
 
     New_X = np.delete(Input.X,NodeNotInList, 0)

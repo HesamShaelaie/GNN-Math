@@ -32,7 +32,7 @@ def RunWithOld():
     for x in range(St, Ed):
         InputDt = read_data(x, INCLUDE_OLD = True)
 
-        InputDt.Lmt = int(InputDt.Lmt*0.2)
+        InputDt.Lmt = int(InputDt.Lmt*0.9)
 
         #InputDt.show()
         ResultDt = Gurobi_Solve(InputDt)
