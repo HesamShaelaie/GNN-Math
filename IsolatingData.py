@@ -119,22 +119,20 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure):
     # ===================================================
     # ========   creating new set of data  ==============
     # ===================================================
+
+
+    
     NodeNotInList = [x for x in range(Input.n) if x not in NodeE]
 
-
     # GETTING ALL THE NODES for the edge which are not on the map
-    edgelistNot = []
-    NodesListNot = set()
+    
+    ReEdge = np.copy(Input.A)
     for i in range(Input.n-1):
         for j in range(i+1, Input.n):
-            if Input.A[i,j] > 0.5 and Output.X[i][j] < 0.5:
-                edgelistNot.append((i,j))
-                NodesListNot.update(set([i]))
-                NodesListNot.update(set([j]))
+            if Input.X[i][j] > 0.5:
+                ReEdge[i,j] = 0
 
-
-    # color edge
-
+    # Color edge
     ALLNode = [x for x in range(Input.n)]
 
     for t in NodeNotInList:
@@ -144,15 +142,33 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure):
             elif t < y:
                 ALLNode[y] = ALLNode[y]-1
 
+    NewPositions = {}
+    for x in range(Input.n):
+        if ALLNode[x] != -1:
+            NewPositions.update({ALLNode[x]:Input.Pos[x]})
+
+
+
     New_A = np.delete(Input.A,NodeNotInList, 0)
     New_A = np.delete(New_A,NodeNotInList, 1)
 
     New_X = np.delete(Input.X,NodeNotInList, 0)
+    New_n = Input.n - len(NodeE)
+    New_Lmt = 0
 
-    New_sr = Input.sr
+    for x in range(New_n):
+        for y in range(New_n):
+            if New_A[x,y]>0.5:
+                New_Lmt = New_Lmt + 1
+
+
+    New_sr = ALLNode[Input.sr]
+    if New_sr == -1:
+        print("New_sr == -1")
+        exit(993)
 
     out = open(FNAMED,'wb')
-    tmp_dic = {'A':New_A, 'X':New_X , 'T':Input.Theta, 'R': Input.sr, 'L':Input.Lmt, 'P':Input.Pos}
+    tmp_dic = {'A':New_A, 'X':New_X , 'T':Input.Theta, 'R': New_sr, 'L':New_Lmt, 'P':NewPositions, 'OA':ReEdge, 'OP':Input.Pos}
 
     pickle.dump(tmp_dic, out)
     out.close()
