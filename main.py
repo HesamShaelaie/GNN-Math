@@ -23,5 +23,24 @@ def RunMainFuntions():
         Write_Result(InputDt, ResultDt)
         Draw_Picture(InputDt, ResultDt)
 
+
+
+def RunWithOld():
+    
+    St = 70254
+    Ed = 70255
+    for x in range(St, Ed):
+        InputDt = read_data(x, INCLUDE_OLD = True)
+
+        InputDt.Lmt = int(InputDt.Lmt*0.2)
+
+        #InputDt.show()
+        ResultDt = Gurobi_Solve(InputDt)
+        print(ResultDt.Time)
+        
+        #Save data and result
+        Write_Result(InputDt, ResultDt)
+        Draw_Picture(InputDt, ResultDt)
+
 if __name__ == '__main__':
-    RunMainFuntions()
+    RunWithOld()

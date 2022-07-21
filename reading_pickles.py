@@ -4,7 +4,7 @@ from data_structures import InputStructure
 from data_structures import OutputStructure
 
 
-def read_data(Index):
+def read_data(Index, INCLUDE_OLD = False):
     
     CurrectFolder = os.path.dirname(os.path.abspath(__file__))
     GNNINPUT = CurrectFolder + "/GNNINPUT/"
@@ -32,6 +32,7 @@ def read_data(Index):
     P = Info['P']
 
 
+
     n = len(A[0,:])
     cnt = 0
     for x in range(n):
@@ -43,7 +44,12 @@ def read_data(Index):
         print("something is wrong with input!!")
         exit(12)
 
+
+
     InputDt = InputStructure(Index, path_to_file, Fname, A, X, T, R, L, P)
+
+    if INCLUDE_OLD:
+        InputDt.getting_old(OA= Info['OA'], OP= Info['OP'])
 
     return InputDt
 

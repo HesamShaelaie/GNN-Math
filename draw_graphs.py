@@ -124,3 +124,6 @@ def Draw_Picture(Input: InputStructure, Output: OutputStructure):
     #nx.draw(G, pos)
     #pylab.show() 
 
+
+
+
