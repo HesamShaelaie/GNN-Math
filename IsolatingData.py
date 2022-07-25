@@ -14,6 +14,84 @@ import os
 from data_structures import OutputStructure
 import os
 
+def Draw_original(Input: InputStructure):
+
+    CurrectFolder = os.path.dirname(os.path.abspath(__file__))
+    GNNPICOUT = CurrectFolder + "/GNNPICOUT"
+
+    if not os.path.isdir(GNNPICOUT):
+        os.mkdir(GNNPICOUT)
+
+    FNAMEI = GNNPICOUT + '/' + Input.Fname + '_O.png'       # Whole nodesh and arcs
+
+    if os.path.isfile(FNAMEI):
+        os.remove(FNAMEI)
+
+    edgelistO = [] # original
+    edgelistC = [] # color of original
+    
+    edge_colors= ["#737373","#000000","#a9b0aa","#80d189","#ccbfbe","#ccbfbe","#ccbfbe"]
+
+    for i in range(Input.n-1):
+        for j in range(i+1, Input.n):
+            if Input.A[i,j] > 0.5:
+                edgelistO.append((i,j))
+                edgelistC.append(edge_colors[1])
+
+
+
+    Positions = {}
+    for x in range(Input.n):
+        Positions[x]=(Input.Pos[x][0],Input.Pos[x][1])
+    
+
+    node_colors= ["#232ab8","#de3737","#a9b0aa","#80d189","#ccbfbe","#ccbfbe","#ccbfbe"]
+    node_sizes = [2,5,7000,9000,11000,13000,15000]
+    node_shapes = ['s', 'o']
+
+
+    G = nx.Graph()
+    G.add_nodes_from(Positions.keys())
+    for a,p in Positions.items():
+        G.nodes[a]['pos'] = p 
+        if a == Input.sr:
+            G.nodes[a]['color'] = node_colors[1]
+            G.nodes[a]['size'] = node_sizes[1]
+            G.nodes[a]['shape'] = node_shapes[0]
+        else:
+            G.nodes[a]['color'] = node_colors[0]
+            G.nodes[a]['size'] = node_sizes[0]
+            G.nodes[a]['shape'] = node_shapes[1]
+
+    G.add_edges_from(edgelistO)
+    nx.draw_networkx_edges(G, Positions, edge_color=edgelistC, width=0.4)
+    '''
+    for shape in set(node_shapes):
+        # the nodes with the desired shapes
+        node_list = [node for node in G.nodes() if G.nodes[node]['shape'] == shape]
+        nx.draw_networkx_nodes(G,Positions,
+                            nodelist = node_list,
+                            node_size = [G.nodes[node]['size'] for node in node_list],
+                            node_color= [G.nodes[node]['color'] for node in node_list],
+                            node_shape = shape)
+    '''
+
+    for shape in set(node_shapes):
+        # the nodes with the desired shapes
+        node_list = [node for node in G.nodes() if G.nodes[node]['shape'] == shape]
+        nx.draw_networkx_nodes(
+                                G,
+                                Positions,
+                                nodelist = node_list,
+                                node_size  = [G.nodes[node]['size'] for node in node_list],
+                                node_color = [G.nodes[node]['color'] for node in node_list],
+                                node_shape = shape
+                            )
+
+    plt.savefig(FNAMEI, dpi=300)
+    plt.clf()
+    
+
 def Write_Draw(Input: InputStructure, Output: OutputStructure):
 
     CurrectFolder = os.path.dirname(os.path.abspath(__file__))
@@ -115,7 +193,6 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure):
     plt.savefig(FNAMEI, dpi=300)
     plt.clf()
 
-
     # ===================================================
     # ========   creating new set of data  ==============
     # ===================================================
@@ -182,16 +259,22 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure):
     out.close()
 
 
+
+
 def ExtactingNodes():
     
-    St = 254
-    Ed = 255
+    St = 900001
+    Ed = 900002
 
     for x in range(St, Ed):
 
-        InputDt = read_data(x)
-        cnt = 0
+        InputDt = read_data(x, INCLUDE_OLD=False, YUE=True)
 
+        Draw_original(InputDt)
+
+
+        exit(33)
+        cnt = 0
         for x in range(InputDt.n):
             for y in range(InputDt.n):
                 if InputDt.A[x,y]>0.5:

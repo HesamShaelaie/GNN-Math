@@ -19,16 +19,25 @@ class InputStructure():
         self.OP = {}
         self.On = -1
 
+        self.ERR_A_Diagonal = 0
+        self.ERR_A_Symmetry = 0
 
         for x in range(self.n):
             for y in range(self.n):
-                if self.A[x,y]>0.5:
-                    self.DenA = self.DenA + 1
+                if x==y:
+                    if self.A[x,y]!= 0:
+                        self.ERR_A_Diagonal = self.ERR_A_Diagonal + 1
+                        self.A[x,y] = 0 
+                else:
+                    if self.A[x,y]>0.5 and self.A[y,x]<0.5:
+                        self.ERR_A_Symmetry = self.ERR_A_Symmetry + 1
+                        self.A[y,x] = 1
 
         if self.DenA%2 != 0:
             print("Input A matrix has problem!")
             exit(3)
-        
+
+        """
         self.DenA = self.DenA/self.n**2 
         self.AA = self.A @ self.A           # n-n . n-n = n by n
         self.AAX = self.AA @ self.X         #n-n . n-d1 = n by d1
@@ -36,6 +45,7 @@ class InputStructure():
         self.AAXTR = self.AAXT[self.sr,:]   #row of n-d2 = 1 by d2
         self.XT = self.X @ self.Theta       #n-d1 . d1-d2 = n by d2
         self.XTW = self.XT @ self.AAXTR.transpose() # n-d2 . d2-1 = n-1
+        """
 
     def getting_old(self, OA, OP):
         self.OA = OA
