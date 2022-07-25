@@ -1,10 +1,15 @@
 import pickle
-import os 
+import os
+from matplotlib.font_manager import findSystemFonts
+
+from numpy import empty 
 from data_structures import InputStructure
 from data_structures import OutputStructure
 
+#{'A':engine.model.A, 'A_POW':engine.model.A_pow, 'X': dataloader['val_loader'].xs,  'T':engine.model.theta, 'R':0, 'L':0, 'lat': engine.model.lat, 'lng': engine.model.lng}
 
-def read_data(Index, INCLUDE_OLD = False):
+
+def read_data(Index, INCLUDE_OLD = False, YUE=False):
     
     CurrectFolder = os.path.dirname(os.path.abspath(__file__))
     GNNINPUT = CurrectFolder + "/GNNINPUT/"
@@ -29,9 +34,16 @@ def read_data(Index, INCLUDE_OLD = False):
     T = Info['T']
     R = Info['R']
     L = Info['L']
-    P = Info['P']
-
-
+    lng = empty
+    lat = empty
+    P   = {}
+    if YUE == True:
+        lng = Info['lng']
+        lat = Info['lat']
+        for i, (lh, lw) in enumerate(zip(lat, lng)):
+            P.update({i:[lh,lw]})
+    else:
+        P = Info['P']
 
     n = len(A[0,:])
     cnt = 0
@@ -54,8 +66,8 @@ def read_data(Index, INCLUDE_OLD = False):
     return InputDt
 
 if __name__ == '__main__':
-    InputDt = read_data(15)
+    InputDt = read_data(900001)
     InputDt.show()
 
 
-        
+
