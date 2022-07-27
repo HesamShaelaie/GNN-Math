@@ -33,9 +33,14 @@ class InputStructure():
                         self.ERR_A_Symmetry = self.ERR_A_Symmetry + 1
                         self.A[y,x] = 1
 
+
+        print(self.X.shape)
+        
         if self.DenA%2 != 0:
             print("Input A matrix has problem!")
             exit(3)
+
+        
 
         """
         self.DenA = self.DenA/self.n**2 

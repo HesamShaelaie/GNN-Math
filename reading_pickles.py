@@ -66,8 +66,11 @@ def read_data(Index, INCLUDE_OLD = False, YUE=False):
     return InputDt
 
 if __name__ == '__main__':
-    InputDt = read_data(900001)
-    InputDt.show()
+    
+    InputDt = read_data(900001,INCLUDE_OLD=False, YUE=True)
+    print(InputDt.X.shape)
+
+    #InputDt.show()
 
 
 

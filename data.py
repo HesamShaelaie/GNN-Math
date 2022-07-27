@@ -60,7 +60,7 @@ class CreateData:
         self.Pos = np.random.randint(0,2000, size=(self.n, 2))
 
 
-        self.A = np.full((self.n, self.n), 1, dtype = np.bool_)
+        self.A = np.full((self.n, self.n), 1, dtype = np.float_)
         UpCnt = 0
 
         for i in range(self.n):
@@ -214,7 +214,7 @@ class CreateData:
             edge_list.append([tri[2], tri[0]])
 
         print("Extract the edge => done")
-        self.A = np.full((self.n, self.n), 0, dtype = np.bool_)
+        self.A = np.full((self.n, self.n), 0, dtype = np.float_)
         for x in edge_list:
             a = x[0]
             b = x[1]
