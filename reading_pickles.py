@@ -61,7 +61,7 @@ def read_data(Index, INCLUDE_OLD = False, YUE=False):
     InputDt = InputStructure(Index, path_to_file, Fname, A, X, T, R, L, P)
 
     if INCLUDE_OLD:
-        InputDt.getting_old(OA= Info['OA'], OP= Info['OP'])
+        InputDt.getting_old(OA= Info['OA'], OP= Info['OP'], LN=Info['LN'])
 
     return InputDt
 

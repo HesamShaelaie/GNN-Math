@@ -31,9 +31,15 @@ def Draw_Picture(Input: InputStructure, Output: OutputStructure, WithOld: Boolea
     edgelistAs = []     #selected
     edgelistAsc = []     #selected color
     edgelistAsw = []     #selected color
-
-
     edgelistO = []
+
+    TmpGap = 0
+    TmpN   = 0
+
+    if WithOld == True:
+        TmpGap = Input.CntA
+        TmpN   = len(Input.OA[0,:])
+
 
     edge_colors= ["#737373","#000000","#de3737","#80d189","#ccbfbe","#ccbfbe","#ccbfbe"]
 
@@ -55,21 +61,42 @@ def Draw_Picture(Input: InputStructure, Output: OutputStructure, WithOld: Boolea
             if Input.A[i,j] > 0.5:
                 edgelistO.append((i,j))
 
+    
+    if WithOld == True:
+        for i in range(TmpN-1):
+            for j in range(i+1, TmpN):
+                if Input.OA[i][j] > 0.5:
+                    edgelistAs.append((i+TmpGap,j+TmpGap))
+                    edgelistAsc.append(edge_colors[0])
+                    edgelistAsw.append(1)
 
-    NodeE = set()
+
+
+    NodeES = set()
+    NodeEN = set()
     for i in range(Input.n-1):
         for j in range(i+1, Input.n):
             if Output.X[i][j] > 0.5:
-                NodeE.update(set([i]))
-                NodeE.update(set([j]))
+                NodeES.update(set([i]))
+                NodeES.update(set([j]))
+            if Input.A[i][j] > 0.5:
+                NodeEN.update(set([i]))
+                NodeEN.update(set([j]))
+
+    NodeEN = NodeEN - NodeES
 
 
     Positions = {}
     n = Input.n
     for x in range(Input.n):
         Positions[x]=(Input.Pos[x][0],Input.Pos[x][1])
+    
+    if WithOld == True:
+        for x in range(TmpN):
+            Positions[x+TmpGap] = (Input.OP[x][0],Input.OP[x][1])
 
-    node_colors= ["#232ab8","#de3737","#80d189","#80d189","#ccbfbe","#ccbfbe","#ccbfbe"]
+
+    node_colors= ["#232ab8","#f70000","#b1b3b1","#80d189","#ccbfbe","#ccbfbe","#ccbfbe"]
     node_sizes = [30,50,7000,9000,11000,13000,15000]
     node_shapes = ['s', 'o']
 
@@ -82,20 +109,30 @@ def Draw_Picture(Input: InputStructure, Output: OutputStructure, WithOld: Boolea
             G.nodes[a]['edgecolor'] = node_colors[1]
             G.nodes[a]['size'] = node_sizes[1]
             G.nodes[a]['shape'] = node_shapes[0]
-        elif a in NodeE:
+        elif a in NodeES:
             G.nodes[a]['color'] = node_colors[0]
             G.nodes[a]['size'] = node_sizes[0]
             G.nodes[a]['edgecolor'] = node_colors[1]
             G.nodes[a]['shape'] = node_shapes[1]
-        else:
+        elif a in NodeEN:
+            G.nodes[a]['color'] = node_colors[0]
+            G.nodes[a]['size'] = node_sizes[0]
+            G.nodes[a]['edgecolor'] = node_colors[0]
+            G.nodes[a]['shape'] = node_shapes[1]
+        elif a in Input.LN:
             G.nodes[a]['color'] = node_colors[2]
             G.nodes[a]['size'] = node_sizes[0]
+            G.nodes[a]['edgecolor'] = node_colors[2]
+            G.nodes[a]['shape'] = node_shapes[1]
+        else:
+            G.nodes[a]['color'] = node_colors[2]
+            G.nodes[a]['size'] = 0
             G.nodes[a]['edgecolor'] = node_colors[2]
             G.nodes[a]['shape'] = node_shapes[1]
 
     #nx.draw(G, Positions)
     G.add_edges_from(edgelistAs)
-    nx.draw_networkx_edges(G, Positions, edge_color=edgelistAsc, width= edgelistAsw)
+    nx.draw_networkx_edges(G, Positions, edge_color=edgelistAsc, width=edgelistAsw)
 
     for shape in set(node_shapes):
         # the nodes with the desired shapes

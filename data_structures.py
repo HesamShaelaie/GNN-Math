@@ -50,6 +50,7 @@ class InputStructure():
 
         self.OA = np.empty
         self.OP = {}
+        self.LN = np.empty
         self.On = -1
 
         self.ERR_A_Diagonal = 0
@@ -115,10 +116,11 @@ class InputStructure():
         self.XTW = self.XT @ self.AAXTR.transpose() #n-d2 . d2-1 = n-1
         self.AAXTR = self.AAXT[self.sr,:]           #row of n-d2 = 1 by d2
 
-    def getting_old(self, OA, OP):
+    def getting_old(self, OA, OP, LN):
         self.OA = OA
         self.OP = OP
         self.On = len(OA[0,:])
+        self.LN = LN
 
 
     def show(self):

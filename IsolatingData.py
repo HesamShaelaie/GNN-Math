@@ -126,12 +126,18 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure):
                 edgelistC.append(edge_colors[0])
 
 
-    NodeE = set()
+    NodeES = set()
+    NodeEN = set()
     for i in range(Input.n-1):
         for j in range(i+1, Input.n):
             if Output.X[i][j] > 0.5:
-                NodeE.update(set([i]))
-                NodeE.update(set([j]))
+                NodeES.update(set([i]))
+                NodeES.update(set([j]))
+            elif Input.A[i,j] > 0.5:
+                NodeEN.update(set([i]))
+                NodeEN.update(set([j]))
+    
+    NodeEN = NodeEN - NodeES
 
 
     Positions = {}
@@ -153,7 +159,7 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure):
             G.nodes[a]['color'] = node_colors[1]
             G.nodes[a]['size'] = node_sizes[1]
             G.nodes[a]['shape'] = node_shapes[0]
-        elif a in NodeE:
+        elif a in NodeES:
             G.nodes[a]['color'] = node_colors[0]
             G.nodes[a]['size'] = node_sizes[0]
             G.nodes[a]['shape'] = node_shapes[1]
@@ -198,7 +204,7 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure):
 
 
     
-    NodeNotInList = [x for x in range(Input.n) if x not in NodeE]
+    NodeNotInList = [x for x in range(Input.n) if x not in NodeES]
 
     # GETTING ALL THE NODES for the edge which are not on the map
     
@@ -252,7 +258,7 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure):
         exit(993)
 
     out = open(FNAMED,'wb')
-    tmp_dic = {'A':New_A, 'X':New_X , 'T':Input.Theta, 'R': New_sr, 'L':New_Lmt, 'P':NewPositions, 'OA':ReEdge, 'OP':Input.Pos}
+    tmp_dic = {'A':New_A, 'X':New_X , 'T':Input.Theta, 'R': New_sr, 'L':New_Lmt, 'P':NewPositions, 'OA':ReEdge, 'OP':Input.Pos, 'LN': list(NodeES)}
 
     pickle.dump(tmp_dic, out)
     out.close()
@@ -260,12 +266,12 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure):
 
 def ExtactingNodes():
     
-    St = 254
+    St = 255
     Ed = 256
 
     for x in range(St, Ed):
 
-        InputDt = read_data(x, INCLUDE_OLD=False, YUE=True)
+        InputDt = read_data(x, INCLUDE_OLD=False, YUE=False)
 
         Draw_original(InputDt)
 

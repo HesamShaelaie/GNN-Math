@@ -128,11 +128,12 @@ def Gurobi_Solve(InputData: InputStructure, Lazy = True):
         OutData.Obj = m.objVal
         
         # testing the solution
-        test_x = x.X
-        Visited = subtour(test_x, InputData.n)
-        for x in Visited:
-            if not x:
-                print("Solution is not valid!!")
+        if Lazy == True:
+            test_x = x.X
+            Visited = subtour(test_x, InputData.n)
+            for x in Visited:
+                if not x:
+                    print("Solution is not valid!!")
         print(OutData.Time)
         return OutData
         

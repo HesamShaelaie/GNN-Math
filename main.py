@@ -45,7 +45,7 @@ def RunWithOld():
         print("Problem solved")
         #Save data and result
         Write_Result(InputDt, ResultDt)
-        Draw_Picture(InputDt, ResultDt)
+        Draw_Picture(InputDt, ResultDt, WithOld=True)
 
 if __name__ == '__main__':
     RunWithOld()
