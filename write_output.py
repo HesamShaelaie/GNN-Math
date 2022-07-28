@@ -6,6 +6,7 @@ from datetime import datetime
 import csv 
 
 def Write_Result(Input: InputStructure, Output: OutputStructure):
+
     # general info
 
     CurrectFolder = os.path.dirname(os.path.abspath(__file__))
@@ -43,21 +44,45 @@ def Write_Result(Input: InputStructure, Output: OutputStructure):
 
          with open(general_info, 'w') as f_object:  
             writer = csv.writer(f_object)
-            header = ['name', 'Time', 'Duration', 'Obj', '#Q', 'Size-A','Den-A','Lim','Size-X-x','Size-X-y', 'Size-T-x', 'Size-T-y', 'R']
+            header = ['name', 'Time', 'Duration', 'Obj','Obj-GNN','Obj-MO','#Q','Size-A','Den-A','Cnt-A','Lim','Size-X-x','Size-X-y', 'Size-T-x', 'Size-T-y', 'R']
             writer.writerow(header)
             
     # Pre-requisite - The CSV file should be manually closed before running this code.
     now = datetime.now()
     dt_string = now.strftime("%d-%m-%Y %H-%M-%S")
+
     # First, open the old CSV file in append mode, hence mentioned as 'a'
     # Then, for the CSV file, create a file object
     with open(general_info, 'a', newline='') as f_object:  
+
         # Pass the CSV  file object to the writer() function
         writer = csv.writer(f_object)
+
         # Result - a writer object
         print(Output.Time)
-        list_data = [Input.Index, dt_string, Output.Time, Output.Obj, Output.NQ, Input.n, Input.DenA, Input.Lmt, len(Input.X[:,0]),  len(Input.X[0,:]), len(Input.Theta[:,0]), len(Input.Theta[0,:]), Input.sr]
-        writer.writerow(list_data)  
+
+        
+        list_data = [
+                        Input.Index,    #name
+                        dt_string,      #when it solved time
+                        Output.Time,    #duration
+                        Output.Obj,     #objective function
+                        Input.ObjGNN,  #objective function of GNN
+                        Output.ObjMO,   #objective function of MO
+                        Output.NQ,      #number of quadratic terms in objective function
+                        Input.n,        #size-A
+                        Input.DenA,     #Den-A
+                        Input.CntA,     #Cnt-A  number of eadge in matrix A
+                        Input.Lmt,      #Lim on the number of eadge in submatrix
+
+                        Input.xX,      #size x x
+                        Input.yX,      #size x y
+                        Input.xT,      #size T x
+                        Input.yT,      #size T y
+                        Input.sr       #which node or R  or row
+        ]
+
+        writer.writerow(list_data)
         # Close the file object
         f_object.close()
 

@@ -8,6 +8,10 @@ from data_structures import InputStructure
 from data_structures import OutputStructure
 import time
 from arg_parse import wait_key
+from reading_pickles import read_data
+from matrix import compare_matrix_g
+
+
 
 def Gurobi_Solve(InputData: InputStructure, Lazy = True):
 
@@ -77,8 +81,50 @@ def Gurobi_Solve(InputData: InputStructure, Lazy = True):
             m.optimize()
         end = time.time()
 
+        #OutData.ObjMO = 
         OutData.Time = end-begin
         OutData.X = x.X
+
+        tmp_ObjMO = np.copy(OutData.X)
+        tmp_ObjGNN = np.copy(InputData.A)
+
+        if not compare_matrix_g(tmp_ObjGNN, tmp_ObjMO):
+            print("not compare_matrix_g(A)")
+            exit(22)
+        
+        tmp_ObjMO = tmp_ObjMO   @ tmp_ObjMO
+        tmp_ObjGNN = tmp_ObjGNN   @ tmp_ObjGNN
+        
+        if not compare_matrix_g(tmp_ObjGNN,tmp_ObjMO):
+            print("not compare_matrix_g(AA)")
+            exit(22)
+
+        tmp_ObjMO = tmp_ObjMO   @ InputData.X
+        tmp_ObjGNN = tmp_ObjGNN   @ InputData.X
+        
+        if not compare_matrix_g(tmp_ObjGNN,tmp_ObjMO):
+            print("not compare_matrix_g(AAX)")
+            exit(22)
+
+        tmp_ObjMO = tmp_ObjMO   @ InputData.Theta
+        tmp_ObjGNN = tmp_ObjGNN     @ InputData.Theta
+        if not compare_matrix_g(tmp_ObjGNN,tmp_ObjMO):
+            print("not compare_matrix_g(AAXT)")
+            exit(22)
+
+        tmp_ObjMO = tmp_ObjMO[InputData.sr,:]
+        tmp_ObjGNN= tmp_ObjGNN[InputData.sr,:]
+        if not compare_matrix_g(tmp_ObjGNN,tmp_ObjMO):
+            print("not compare_matrix_g(AAXTR)")
+            exit(22)
+
+        tmp_ObjMO = tmp_ObjMO   @ InputData.tmp_sum
+        tmp_ObjGNN = tmp_ObjGNN   @ InputData.tmp_sum
+        
+        if tmp_ObjMO > tmp_ObjGNN:
+            print("tmp_ObjMO > tmp_ObjGNN")
+            exit(11)
+        OutData.ObjMO = tmp_ObjMO
         OutData.Obj = m.objVal
         
         # testing the solution
@@ -188,3 +234,21 @@ def subtour(vals, n):
 
     return visited
 
+
+if __name__ == '__main__':
+    St = 254
+    Ed = 255
+    for x in range(St, Ed):
+
+        InputDt = read_data(x)
+        #InputDt.Lmt = int(InputDt.Lmt*0.2)
+
+        print('InputDt.Lmt:     %d'%InputDt.Lmt)
+        print('InputDt.CntA:    %d'%InputDt.CntA)
+        
+        ResultDt = Gurobi_Solve(InputDt)
+        print(ResultDt.Time)
+        
+        #Save data and result
+        #Write_Result(InputDt, ResultDt)
+        #Draw_Picture(InputDt, ResultDt)

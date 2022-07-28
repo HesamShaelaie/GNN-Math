@@ -11,11 +11,13 @@ def RunMainFuntions():
     St = 254
     Ed = 255
     for x in range(St, Ed):
+
         InputDt = read_data(x)
+        #InputDt.Lmt = int(InputDt.Lmt*0.2)
 
-        InputDt.Lmt = int(InputDt.Lmt*0.2)
-
-        #InputDt.show()
+        print('InputDt.Lmt:     %d'%InputDt.Lmt)
+        print('InputDt.CntA:    %d'%InputDt.CntA)
+        
         ResultDt = Gurobi_Solve(InputDt)
         print(ResultDt.Time)
         
@@ -43,4 +45,4 @@ def RunWithOld():
         Draw_Picture(InputDt, ResultDt)
 
 if __name__ == '__main__':
-    RunWithOld()
+    RunMainFuntions()

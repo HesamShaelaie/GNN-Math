@@ -8,7 +8,6 @@ from data_structures import OutputStructure
 
 #{'A':engine.model.A, 'A_POW':engine.model.A_pow, 'X': dataloader['val_loader'].xs,  'T':engine.model.theta, 'R':0, 'L':0, 'lat': engine.model.lat, 'lng': engine.model.lng}
 
-
 def read_data(Index, INCLUDE_OLD = False, YUE=False):
     
     CurrectFolder = os.path.dirname(os.path.abspath(__file__))
@@ -34,8 +33,10 @@ def read_data(Index, INCLUDE_OLD = False, YUE=False):
     T = Info['T']
     R = Info['R']
     L = Info['L']
+
     lng = empty
     lat = empty
+
     P   = {}
     if YUE == True:
         lng = Info['lng']
@@ -55,7 +56,6 @@ def read_data(Index, INCLUDE_OLD = False, YUE=False):
     if cnt < L:
         print("something is wrong with input!!")
         exit(12)
-
 
 
     InputDt = InputStructure(Index, path_to_file, Fname, A, X, T, R, L, P)
