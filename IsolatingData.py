@@ -101,7 +101,7 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure):
     if not os.path.isdir(GNNPICOUT):
         os.mkdir(GNNPICOUT)
 
-    FNAMEI = GNNPICOUT + '/' + Input.Fname + '_I.png'
+    FNAMEI = GNNPICOUT + '/' + Input.Fname + '_X.png'
     FNAMED = GNNINPUT + '/' + str(int(Input.Fname)+70000) + '.txt'
 
 
@@ -111,7 +111,6 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure):
     if os.path.isfile(FNAMED):
         os.remove(FNAMED)
     
-
     edgelistO = []
     edgelistC = []
     
@@ -141,7 +140,7 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure):
         Positions[x]=(Input.Pos[x][0],Input.Pos[x][1])
     
 
-    node_colors= ["#232ab8","#de3737","#a9b0aa","#80d189","#ccbfbe","#ccbfbe","#ccbfbe"]
+    node_colors= ["#232ab8","#c26b29","#a9b0aa","#80d189","#ccbfbe","#ccbfbe","#ccbfbe"]
     node_sizes = [30,50,7000,9000,11000,13000,15000]
     node_shapes = ['s', 'o']
 
@@ -259,12 +258,10 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure):
     out.close()
 
 
-
-
 def ExtactingNodes():
     
-    St = 900001
-    Ed = 900002
+    St = 254
+    Ed = 256
 
     for x in range(St, Ed):
 
@@ -272,8 +269,7 @@ def ExtactingNodes():
 
         Draw_original(InputDt)
 
-
-        exit(33)
+        
         cnt = 0
         for x in range(InputDt.n):
             for y in range(InputDt.n):
