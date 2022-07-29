@@ -258,7 +258,7 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure):
         exit(993)
 
     out = open(FNAMED,'wb')
-    tmp_dic = {'A':New_A, 'X':New_X , 'T':Input.Theta, 'R': New_sr, 'L':New_Lmt, 'P':NewPositions, 'OA':ReEdge, 'OP':Input.Pos, 'LN': list(NodeES)}
+    tmp_dic = {'A':New_A, 'X':New_X , 'T':Input.Theta, 'R': New_sr, 'L':New_Lmt, 'P':NewPositions, 'OA':ReEdge, 'OP':Input.Pos, 'LN': list(NodeEN)}
 
     pickle.dump(tmp_dic, out)
     out.close()
@@ -266,7 +266,7 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure):
 
 def ExtactingNodes():
     
-    St = 255
+    St = 254
     Ed = 256
 
     for x in range(St, Ed):
