@@ -92,7 +92,7 @@ def Draw_original(Input: InputStructure):
     plt.clf()
     
 
-def Write_Draw(Input: InputStructure, Output: OutputStructure):
+def Write_Draw(Input: InputStructure, Output: OutputStructure, WithKTwo: bool = False):
 
     CurrectFolder = os.path.dirname(os.path.abspath(__file__))
     GNNPICOUT = CurrectFolder + "/GNNPICOUT"
@@ -113,17 +113,20 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure):
     
     edgelistO = []
     edgelistC = []
+    edgelistW = []
     
     edge_colors= ["#737373","#000000","#a9b0aa","#80d189","#ccbfbe","#ccbfbe","#ccbfbe"]
 
     for i in range(Input.n-1):
         for j in range(i+1, Input.n):
-            if Output.X[i][j] > 0.5:
+            if Output.X[i][j] > 0.5 and Input.OriginalA[i][j]>0.5:
                 edgelistO.append((i,j))
                 edgelistC.append(edge_colors[1])
+                edgelistW.append(0.3)
             elif Input.A[i,j] > 0.5:
                 edgelistO.append((i,j))
                 edgelistC.append(edge_colors[0])
+                edgelistW.append(0.05)
 
 
     NodeES = set()
@@ -147,7 +150,7 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure):
     
 
     node_colors= ["#232ab8","#c26b29","#a9b0aa","#80d189","#ccbfbe","#ccbfbe","#ccbfbe"]
-    node_sizes = [2,5,7000,9000,11000,13000,15000]
+    node_sizes = [0.1,0.2,7000,9000,11000,13000,15000]
     node_shapes = ['s', 'o']
 
 
@@ -171,7 +174,7 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure):
     G.add_edges_from(edgelistO)
 
     #nx.draw(G, Positions)
-    nx.draw_networkx_edges(G, Positions, edge_color=edgelistC)
+    nx.draw_networkx_edges(G, Positions, edge_color=edgelistC, width = edgelistW)
     '''
     for shape in set(node_shapes):
         # the nodes with the desired shapes
@@ -195,7 +198,7 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure):
                                 node_shape = shape
                             )
 
-    plt.savefig(FNAMEI, dpi=300)
+    plt.savefig(FNAMEI, dpi=1000)
     plt.clf()
 
     # ===================================================
@@ -258,7 +261,7 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure):
         exit(993)
 
     out = open(FNAMED,'wb')
-    tmp_dic = {'A':New_A, 'X':New_X , 'T':Input.Theta, 'R': New_sr, 'L':New_Lmt, 'P':NewPositions, 'OA':ReEdge, 'OP':Input.Pos, 'LN': list(NodeEN)}
+    tmp_dic = {'A':New_A, 'X':New_X , 'T':Input.Theta, 'R': New_sr, 'L':New_Lmt, 'P':NewPositions, 'OA':ReEdge, 'OP':Input.Pos, 'LN': list(NodeEN), 'ORGA': Input.OriginalA}
 
     pickle.dump(tmp_dic, out)
     out.close()
@@ -271,10 +274,9 @@ def ExtactingNodes():
 
     for x in range(St, Ed):
 
-        InputDt = read_data(x, INCLUDE_OLD=False, YUE=True)
+        InputDt = read_data(x, INCLUDE_OLD=False, YUE=False)
 
         Draw_original(InputDt)
-
         
         cnt = 0
         for x in range(InputDt.n):
@@ -298,5 +300,52 @@ def ExtactingNodes():
         #Save data and result
         Write_Draw(InputDt, ResultDt)
 
+
+
+def ExtactingNodes_YUE():
+    
+    St = 900003
+    Ed = 900004
+
+    for x in range(St, Ed):
+
+        InputDt = read_data(x, INCLUDE_OLD=False, YUE=True)
+
+        InputDt.A = InputDt.A@InputDt.A + InputDt.A
+        for x in range(InputDt.n):
+            for y in range(InputDt.n):
+                if InputDt.A[x][y]>0.5:
+                    InputDt.A[x][y] = 1
+                    InputDt.A[y][x] = 1
+                if x == y:
+                    InputDt.A[x][y] = 1
+                
+
+        Draw_original(InputDt)
+        
+        cnt = 0
+        for x in range(InputDt.n):
+            for y in range(InputDt.n):
+                if InputDt.A[x,y]>0.5:
+                    cnt = cnt + 1
+
+        InputDt.Lmt = cnt + 100
+
+        TmpX  = InputDt.X
+        TmpT  = InputDt.Theta
+
+        InputDt.X = np.full((InputDt.xX, InputDt.yX), 1, dtype = np.float_)
+        InputDt.Theta = np.full((InputDt.xT, InputDt.yT), 1, dtype = np.float_)
+
+        ResultDt = Gurobi_Solve(InputDt, Lazy= False, YUE= True)
+
+        InputDt.X = TmpX 
+        InputDt.Theta = TmpT
+        
+        #Save data and result
+        Write_Draw(InputDt, ResultDt, WithKTwo= True)
+
+
 if __name__ == '__main__':
-    ExtactingNodes()
+    #ExtactingNodes()
+    ExtactingNodes_YUE()

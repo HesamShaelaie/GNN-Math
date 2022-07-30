@@ -38,7 +38,8 @@ class InputStructure():
                         self.A[x][y]=1
         else:
             self.A = A
-
+            
+        self.OriginalA = np.copy(self.A)
         self.X = X
         self.Theta = T
         self.sr = R
