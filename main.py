@@ -10,6 +10,7 @@ def RunMainFuntions():
     
     St = 254
     Ed = 255
+    
     for x in range(St, Ed):
 
         InputDt = read_data(x)

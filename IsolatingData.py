@@ -147,7 +147,7 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure):
     
 
     node_colors= ["#232ab8","#c26b29","#a9b0aa","#80d189","#ccbfbe","#ccbfbe","#ccbfbe"]
-    node_sizes = [30,50,7000,9000,11000,13000,15000]
+    node_sizes = [2,5,7000,9000,11000,13000,15000]
     node_shapes = ['s', 'o']
 
 
@@ -266,12 +266,12 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure):
 
 def ExtactingNodes():
     
-    St = 254
-    Ed = 256
+    St = 900003
+    Ed = 900004
 
     for x in range(St, Ed):
 
-        InputDt = read_data(x, INCLUDE_OLD=False, YUE=False)
+        InputDt = read_data(x, INCLUDE_OLD=False, YUE=True)
 
         Draw_original(InputDt)
 
@@ -284,7 +284,16 @@ def ExtactingNodes():
 
         InputDt.Lmt = cnt + 100
 
-        ResultDt = Gurobi_Solve(InputDt, Lazy= False)
+        TmpX  = InputDt.X
+        TmpT  = InputDt.Theta
+
+        InputDt.X = np.full((InputDt.xX, InputDt.yX), 1, dtype = np.float_)
+        InputDt.Theta = np.full((InputDt.xT, InputDt.yT), 1, dtype = np.float_)
+
+        ResultDt = Gurobi_Solve(InputDt, Lazy= False, YUE=True)
+
+        InputDt.X = TmpX 
+        InputDt.Theta = TmpT
         
         #Save data and result
         Write_Draw(InputDt, ResultDt)

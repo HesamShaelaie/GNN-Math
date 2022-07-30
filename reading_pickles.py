@@ -1,7 +1,7 @@
 import pickle
 import os
 from matplotlib.font_manager import findSystemFonts
-
+import numpy as np
 from numpy import empty 
 from data_structures import InputStructure
 from data_structures import OutputStructure
@@ -43,6 +43,24 @@ def read_data(Index, INCLUDE_OLD = False, YUE=False):
         lat = Info['lat']
         for i, (lh, lw) in enumerate(zip(lat, lng)):
             P.update({i:[lh,lw]})
+    
+
+        tmpA = np.shape(A)[0]
+
+        for x in range(tmpA):
+            for y in range(tmpA):
+                if A[x][y]>0.5:
+                    A[x][y]=1
+                    A[y][x]=1
+
+
+        for x in range(tmpA):
+            A[x][x]=0
+
+        print(np.shape(X))
+        tmpX = X[0,:,:,0].transpose()
+        X = tmpX
+
     else:
         P = Info['P']
 
@@ -67,8 +85,8 @@ def read_data(Index, INCLUDE_OLD = False, YUE=False):
 
 if __name__ == '__main__':
     
-    InputDt = read_data(900001,INCLUDE_OLD=False, YUE=True)
-    print(InputDt.X.shape)
+    InputDt = read_data(900003, INCLUDE_OLD = False, YUE = True)
+    
 
     #InputDt.show()
 

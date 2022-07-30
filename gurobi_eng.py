@@ -13,7 +13,7 @@ from matrix import compare_matrix_g
 
 
 
-def Gurobi_Solve(InputData: InputStructure, Lazy = True):
+def Gurobi_Solve(InputData: InputStructure, Lazy = True, YUE: bool =False):
 
     try:
         #Data input
@@ -41,7 +41,7 @@ def Gurobi_Solve(InputData: InputStructure, Lazy = True):
             for i1,j1,i2,j2 in z:
                 obj.add(InputData.XTW[Pindex]*x[i1,j1]*x[i2,j2])
 
-            if InputData.XTW[Pindex] <= 0:
+            if InputData.XTW[Pindex] <= 0 and YUE != True:
                 cnt_negetive_trm = cnt_negetive_trm + 1
                 print("We have negative/zero coefficient in objective function!!")
                 exit(3355)
@@ -95,7 +95,7 @@ def Gurobi_Solve(InputData: InputStructure, Lazy = True):
         tmp_ObjMO = tmp_ObjMO   @ tmp_ObjMO
         tmp_ObjGNN = tmp_ObjGNN   @ tmp_ObjGNN
         
-        if not compare_matrix_g(tmp_ObjGNN,tmp_ObjMO):
+        if not compare_matrix_g(tmp_ObjGNN, tmp_ObjMO):
             print("not compare_matrix_g(AA)")
             exit(22)
 
