@@ -245,6 +245,11 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure, WithKTwo: bool = 
     New_A = np.delete(New_A,NodeNotInList, 0)
     New_A = np.delete(New_A,NodeNotInList, 1)
 
+    New_OrgA = np.copy(Input.OriginalA)
+
+    New_OrgA = np.delete(New_OrgA,NodeNotInList, 0)
+    New_OrgA = np.delete(New_OrgA,NodeNotInList, 1)
+
     New_X = np.delete(Input.X,NodeNotInList, 0)
     New_n = Input.n - len(NodeNotInList)
     New_Lmt = 0
@@ -261,7 +266,7 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure, WithKTwo: bool = 
         exit(993)
 
     out = open(FNAMED,'wb')
-    tmp_dic = {'A':New_A, 'X':New_X , 'T':Input.Theta, 'R': New_sr, 'L':New_Lmt, 'P':NewPositions, 'OA':ReEdge, 'OP':Input.Pos, 'LN': list(NodeEN), 'ORGA': Input.OriginalA}
+    tmp_dic = {'A':New_A, 'X':New_X , 'T':Input.Theta, 'R': New_sr, 'L':New_Lmt, 'P':NewPositions, 'OA':ReEdge, 'OP':Input.Pos, 'LN': list(NodeEN), 'ORGA': New_OrgA}
 
     pickle.dump(tmp_dic, out)
     out.close()

@@ -38,7 +38,7 @@ class InputStructure():
                         self.A[x][y]=1
         else:
             self.A = A
-            
+
         self.OriginalA = np.copy(self.A)
         self.X = X
         self.Theta = T
@@ -117,11 +117,12 @@ class InputStructure():
         self.XTW = self.XT @ self.AAXTR.transpose() #n-d2 . d2-1 = n-1
         self.AAXTR = self.AAXT[self.sr,:]           #row of n-d2 = 1 by d2
 
-    def getting_old(self, OA, OP, LN):
+    def getting_old(self, OA, OP, LN, OriginalA):
         self.OA = OA
         self.OP = OP
         self.On = len(OA[0,:])
         self.LN = LN
+        self.OriginalA = OriginalA
 
 
     def show(self):
