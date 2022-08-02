@@ -11,7 +11,7 @@ from data_structures import OutputStructure
 
 
 
-def Draw_Picture(Input: InputStructure, Output: OutputStructure, WithOld: Boolean = False):
+def Draw_Picture(Input: InputStructure, Output: OutputStructure, WithOld: Boolean = False, YUE: bool = False):
 
     CurrectFolder = os.path.dirname(os.path.abspath(__file__))
     GNNPICOUT = CurrectFolder + "/GNNPICOUT"
