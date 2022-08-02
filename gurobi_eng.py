@@ -13,7 +13,7 @@ from matrix import compare_matrix_g
 
 
 
-def Gurobi_Solve(InputData: InputStructure, Lazy = True, YUE: bool =False):
+def Gurobi_Solve(InputData: InputStructure, Lazy = True, YUE: bool =False, Testing:bool =False):
 
     try:
         #Data input
@@ -59,12 +59,12 @@ def Gurobi_Solve(InputData: InputStructure, Lazy = True, YUE: bool =False):
             for j in range(N):
                 m.addConstr(x[i,j] <= InputData.A[i,j])
 
-
+        '''
         #constraint (2)
         for i in range(N-1):
             for j in range(i+1, N):
                 m.addConstr(x[i,j] == x[j,i])
-
+        '''
         
         #constraint (3)
         m.addConstr(gp.quicksum(x[i,j] for i in range(N) for j in range(N)) <= Lmt)
@@ -85,46 +85,73 @@ def Gurobi_Solve(InputData: InputStructure, Lazy = True, YUE: bool =False):
         OutData.Time = end-begin
         OutData.X = x.X
 
-        tmp_ObjMO = np.copy(OutData.X)
-        tmp_ObjGNN = np.copy(InputData.A)
 
-        if not compare_matrix_g(tmp_ObjGNN, tmp_ObjMO) and not YUE:
-            print("not compare_matrix_g(A)")
-            exit(22)
+        if Testing == True:
+
+            tmp_ObjMO = np.copy(OutData.X)
+            tmp_ObjGNN = np.copy(InputData.A)
+
+            if not compare_matrix_g(tmp_ObjGNN, tmp_ObjMO) and not YUE:
+                print("not compare_matrix_g(A)")
+                exit(22)
+            
+            tmp_ObjMO = tmp_ObjMO   @ tmp_ObjMO
+            tmp_ObjGNN = tmp_ObjGNN   @ tmp_ObjGNN
+            
+            if not compare_matrix_g(tmp_ObjGNN, tmp_ObjMO) and not YUE:
+                print("not compare_matrix_g(AA)")
+                exit(22)
+
+            tmp_ObjMO = tmp_ObjMO   @ InputData.X
+            tmp_ObjGNN = tmp_ObjGNN   @ InputData.X
+            
+            if not compare_matrix_g(tmp_ObjGNN,tmp_ObjMO) and not YUE:
+                print("not compare_matrix_g(AAX)")
+                exit(22)
+
+            tmp_ObjMO = tmp_ObjMO   @ InputData.Theta
+            tmp_ObjGNN = tmp_ObjGNN     @ InputData.Theta
+            if not compare_matrix_g(tmp_ObjGNN,tmp_ObjMO) and not YUE:
+                print("not compare_matrix_g(AAXT)")
+                exit(22)
+
+            tmp_ObjMO = tmp_ObjMO[InputData.sr,:]
+            tmp_ObjGNN= tmp_ObjGNN[InputData.sr,:]
+            if not compare_matrix_g(tmp_ObjGNN,tmp_ObjMO) and not YUE:
+                print("not compare_matrix_g(AAXTR)")
+                exit(22)
+
+            tmp_ObjMO = tmp_ObjMO   @ InputData.tmp_sum
+            tmp_ObjGNN = tmp_ObjGNN   @ InputData.tmp_sum
+            
+            if tmp_ObjMO > tmp_ObjGNN and not YUE:
+                print("tmp_ObjMO > tmp_ObjGNN")
+                exit(11)
         
-        tmp_ObjMO = tmp_ObjMO   @ tmp_ObjMO
-        tmp_ObjGNN = tmp_ObjGNN   @ tmp_ObjGNN
+            OutData.ObjMO = tmp_ObjMO
+
+        else:
+
+            tmp_ObjMO = np.copy(OutData.X)
+            tmp_ObjGNN = np.copy(InputData.A)
+
+            tmp_ObjMO = tmp_ObjMO   @ tmp_ObjMO
+            tmp_ObjGNN = tmp_ObjGNN   @ tmp_ObjGNN
         
-        if not compare_matrix_g(tmp_ObjGNN, tmp_ObjMO) and not YUE:
-            print("not compare_matrix_g(AA)")
-            exit(22)
+            tmp_ObjMO = tmp_ObjMO   @ InputData.X
+            tmp_ObjGNN = tmp_ObjGNN   @ InputData.X
+            
+            tmp_ObjMO = tmp_ObjMO   @ InputData.Theta
+            tmp_ObjGNN = tmp_ObjGNN     @ InputData.Theta
 
-        tmp_ObjMO = tmp_ObjMO   @ InputData.X
-        tmp_ObjGNN = tmp_ObjGNN   @ InputData.X
-        
-        if not compare_matrix_g(tmp_ObjGNN,tmp_ObjMO) and not YUE:
-            print("not compare_matrix_g(AAX)")
-            exit(22)
+            tmp_ObjMO = tmp_ObjMO[InputData.sr,:]
+            tmp_ObjGNN= tmp_ObjGNN[InputData.sr,:]
+            
+            tmp_ObjMO = tmp_ObjMO   @ InputData.tmp_sum
+            tmp_ObjGNN = tmp_ObjGNN   @ InputData.tmp_sum
+            
+            OutData.ObjMO = tmp_ObjMO
 
-        tmp_ObjMO = tmp_ObjMO   @ InputData.Theta
-        tmp_ObjGNN = tmp_ObjGNN     @ InputData.Theta
-        if not compare_matrix_g(tmp_ObjGNN,tmp_ObjMO) and not YUE:
-            print("not compare_matrix_g(AAXT)")
-            exit(22)
-
-        tmp_ObjMO = tmp_ObjMO[InputData.sr,:]
-        tmp_ObjGNN= tmp_ObjGNN[InputData.sr,:]
-        if not compare_matrix_g(tmp_ObjGNN,tmp_ObjMO) and not YUE:
-            print("not compare_matrix_g(AAXTR)")
-            exit(22)
-
-        tmp_ObjMO = tmp_ObjMO   @ InputData.tmp_sum
-        tmp_ObjGNN = tmp_ObjGNN   @ InputData.tmp_sum
-        
-        if tmp_ObjMO > tmp_ObjGNN and not YUE:
-            print("tmp_ObjMO > tmp_ObjGNN")
-            exit(11)
-        OutData.ObjMO = tmp_ObjMO
         OutData.Obj = m.objVal
         
         # testing the solution
@@ -237,11 +264,15 @@ def subtour(vals, n):
 
 
 if __name__ == '__main__':
-    St = 254
-    Ed = 255
+
+    St = 900003
+    Ed = 900004
+    Par_K = 2
+
     for x in range(St, Ed):
 
-        InputDt = read_data(x)
+        InputDt = read_data(x, INCLUDE_OLD=False, YUE=True)
+
         #InputDt.Lmt = int(InputDt.Lmt*0.2)
 
         print('InputDt.Lmt:     %d'%InputDt.Lmt)

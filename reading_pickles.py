@@ -84,7 +84,6 @@ def read_data(Index, INCLUDE_OLD = False, YUE=False):
     return InputDt
 
 if __name__ == '__main__':
-    
     InputDt = read_data(900003, INCLUDE_OLD = False, YUE = True)
     
 

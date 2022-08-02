@@ -51,17 +51,14 @@ def RunWithOld():
 
 def RunRealData():
 
-    
-    St = 970003
-    Ed = 970004
-
+    St = 900003
+    Ed = 900004
 
     for x in range(St, Ed):
-        InputDt = read_data(x, INCLUDE_OLD = True)
+        InputDt = read_data(x, INCLUDE_OLD = False, YUE=True)
 
         InputDt.Lmt = int(InputDt.Lmt * 0.5)
 
-        
         #InputDt.Lmt = 20*2
         #InputDt.show()
         ResultDt = Gurobi_Solve(InputDt, Lazy=False, YUE=True)
