@@ -5,6 +5,7 @@ np.random.seed(3)
 
 
 A = np.full((10,10), 10, dtype=float)
+CA1 = np.copy
 X = np.random.uniform(0,1, size=(10, 20))
 T = np.random.uniform(0,1, size=(20, 5))
 
