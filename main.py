@@ -61,6 +61,7 @@ def RunRealData():
 
         InputDt.Lmt = int(InputDt.Lmt * 0.5)
 
+        
         #InputDt.Lmt = 20*2
         #InputDt.show()
         ResultDt = Gurobi_Solve(InputDt, Lazy=False, YUE=True)
