@@ -55,14 +55,12 @@ def RunRealData():
     Ed = 900004
 
     for x in range(St, Ed):
+
         InputDt = read_data(x, INCLUDE_OLD = False, YUE=True)
 
-        InputDt.recalculate(2, ResetLimit = True)
+        InputDt.recalculate(1, ResetLimit = True)
         
         InputDt.Lmt = int(InputDt.Lmt * 0.5)
-
-        #InputDt.Lmt = 20*2
-        #InputDt.show()
 
         ResultDt = Gurobi_Solve(InputDt, Lazy=False, YUE=True, Testing= False)
 
@@ -70,7 +68,7 @@ def RunRealData():
         print("Problem solved")
         #Save data and result
         Write_Result(InputDt, ResultDt)
-        #Draw_Picture(InputDt, ResultDt, WithOld=True, YUE= True)
+        Draw_Picture(InputDt, ResultDt, WithOld=False, YUE= True)
 
 
 if __name__ == '__main__':

@@ -37,28 +37,28 @@ def Draw_Picture(Input: InputStructure, Output: OutputStructure, WithOld: Boolea
     TmpN   = 0
 
     if WithOld == True:
-        TmpGap = Input.CntA
+        TmpGap = Input.CntAK
         TmpN   = len(Input.OA[0,:])
 
 
     edge_colors= ["#737373","#000000","#de3737","#80d189","#ccbfbe","#ccbfbe","#ccbfbe"]
 
-    for i in range(Input.n-1):
-        for j in range(i+1, Input.n):
+    for i in range(Input.n):
+        for j in range(Input.n):
 
             if Output.X[i][j] > 0.5:
                 edgelistAs.append((i,j))
                 edgelistAsc.append(edge_colors[2])
-                edgelistAsw.append(0.5)
+                edgelistAsw.append(0.1)
 
                 
-            elif Input.A[i,j] > 0.5:
+            elif Input.A[i][j] > 0.5:
                 
                 edgelistAs.append((i,j))
                 edgelistAsc.append(edge_colors[1])
-                edgelistAsw.append(1)
+                edgelistAsw.append(0.2)
 
-            if Input.A[i,j] > 0.5:
+            if Input.A[i][j] > 0.5:
                 edgelistO.append((i,j))
 
     
@@ -72,16 +72,14 @@ def Draw_Picture(Input: InputStructure, Output: OutputStructure, WithOld: Boolea
 
     NodeES = set()
     NodeEN = set()
-    for i in range(Input.n-1):
-        for j in range(i+1, Input.n):
+    for i in range(Input.n):
+        for j in range(Input.n):
             if Output.X[i][j] > 0.5:
                 NodeES.update(set([i]))
                 NodeES.update(set([j]))
             if Input.A[i][j] > 0.5:
                 NodeEN.update(set([i]))
                 NodeEN.update(set([j]))
-
-
 
 
     NodeEN = NodeEN - NodeES
@@ -99,11 +97,12 @@ def Draw_Picture(Input: InputStructure, Output: OutputStructure, WithOld: Boolea
             Positions[x+TmpGap] = (Input.OP[x][0],Input.OP[x][1])
 
     node_colors= ["#232ab8","#f70000","#b1b3b1","#80d189","#ccbfbe","#ccbfbe","#ccbfbe"]
-    node_sizes = [30,50,7000,9000,11000,13000,15000]
+    node_sizes = [0.5,1,7000,9000,11000,13000,15000]
     node_shapes = ['s', 'o']
     
-    OldNodes = [x+TmpGap  for x in Input.LN]
-    Tmp3 = len(OldNodes)
+    if WithOld == True:
+        OldNodes = [x+TmpGap  for x in Input.LN]
+        Tmp3 = len(OldNodes)
 
     G = nx.Graph()
     G.add_nodes_from(Positions.keys())
@@ -161,7 +160,7 @@ def Draw_Picture(Input: InputStructure, Output: OutputStructure, WithOld: Boolea
                             node_shape= shape)
 
     
-    plt.savefig(FNAMEA, dpi=300)
+    plt.savefig(FNAMEA, dpi=1100)
     plt.clf()
 
     G = nx.Graph()
@@ -188,7 +187,7 @@ def Draw_Picture(Input: InputStructure, Output: OutputStructure, WithOld: Boolea
                             node_color= [G.nodes[node]['color'] for node in node_list],
                             node_shape = shape)
 
-    plt.savefig(FNAMEO, dpi=300)
+    plt.savefig(FNAMEO, dpi=1100)
     plt.clf()
 
 

@@ -62,7 +62,7 @@ class InputStructure():
                 if self.CopyA[x][y]>0.5:
                     self.CntAO = self.CntAO + 1
 
-        self.DenAO = float(self.CntAO)/self.n**2 
+        self.DenAO = float(self.CntAO*100)/self.n**2 
     
     #defualt value of the K is 2 as we got it from the original model
     def recalculate(self, K: int = 1, ResetLimit:bool = True):
@@ -93,7 +93,7 @@ class InputStructure():
                 if self.A[x][y]>0.5:
                     self.CntAK = self.CntAK + 1
 
-        self.DenAK = float(self.CntAK)/self.n**2         
+        self.DenAK = float(self.CntAK*100)/self.n**2
 
         if ResetLimit:
             self.Lmt = self.CntAK

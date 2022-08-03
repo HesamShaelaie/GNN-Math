@@ -44,7 +44,7 @@ def Write_Result(Input: InputStructure, Output: OutputStructure):
 
          with open(general_info, 'w') as f_object:  
             writer = csv.writer(f_object)
-            header = ['name', 'Time', 'Duration', 'Obj','Obj-GNN','Obj-MO','#Q','Size-A','Den-AO','Cnt-AO', 'Den-AK','Cnt-AK' ,'Lim','CntX', 'Size-X-x','Size-X-y', 'Size-T-x', 'Size-T-y', 'R']
+            header = ['name', 'Time', 'Duration', 'Obj','Obj-GNN','Obj-MO','#Q','Size-A','Den-AO%','Cnt-AO', 'Den-AK%','Cnt-AK' ,'Lim','CntX', 'Size-X-x','Size-X-y', 'Size-T-x', 'Size-T-y', 'R']
             writer.writerow(header)
             
     # Pre-requisite - The CSV file should be manually closed before running this code.
