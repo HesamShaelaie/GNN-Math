@@ -29,6 +29,8 @@ class InputStructure():
             exit(33)
         
 
+        
+        
         self.A = any
         if type(A[0][0]==bool):
             self.A = np.full((self.n, self.n), 0, dtype = np.float_)
@@ -38,8 +40,15 @@ class InputStructure():
                         self.A[x][y]=1
         else:
             self.A = A
+        
+        for x in range(self.n):
+            A[x][x] = 0
 
         self.CopyA = np.copy(self.A)
+        self.CopyX = np.copy(X)
+        self.CopyTheta = np.copy(T)
+
+        
         self.X = X
         self.Theta = T
         self.sr = R
@@ -64,15 +73,38 @@ class InputStructure():
 
         self.DenAO = float(self.CntAO*100)/self.n**2 
     
-    #defualt value of the K is 2 as we got it from the original model
-    def recalculate(self, K: int = 1, ResetLimit:bool = True):
 
-        tmp = np.copy(self.CopyA)
+    def reset_A(self):
+        self.A = np.copy(self.CopyA)
+
+    def set_A(self, tmp):
+        self.A = tmp
+    
+    def blank_X(self):
+        self.X = np.full((self.xX, self.yX), 1, dtype = np.float_)
+        
+    def blank_T(self):
+        self.Theta = np.full((self.xT, self.yT), 1, dtype = np.float_)
+
+    def reset_X(self):
+        self.X = np.copy(self.CopyX)
+
+    def reset_T(self):
+        self.Theta = np.copy(self.CopyTheta)
+
+    #defualt value of the K is 2 as we got it from the original model
+    def recalculate(self, K: int = 1, ResetLimit:bool = True, WithAdjustment:bool = True):
+
+        tmp = np.copy(self.A)
 
         self.K = K
 
         for _ in range(1, K):
-            tmp = tmp @ self.CopyA
+            tmp = tmp @ self.A
+
+        if WithAdjustment:
+            for x in range(self.n):
+                tmp[x][x] = 0
 
         self.A = tmp
         self.AA = self.A @ self.A                   #n-n . n-n = n by n
@@ -86,7 +118,7 @@ class InputStructure():
         self.XT = self.X @ self.Theta               #n-d1 . d1-d2 = n by d2
         self.XTW = self.XT @ self.AAXTR.transpose() #n-d2 . d2-1 = n-1
         
-
+        
         self.CntAK = 0
         for x in range(self.n):
             for y in range(self.n):

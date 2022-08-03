@@ -13,7 +13,7 @@ from matrix import compare_matrix_g
 
 
 
-def Gurobi_Solve(InputData: InputStructure, Lazy = True, YUE: bool =False, Testing:bool =False):
+def Gurobi_Solve(InputData: InputStructure, Lazy = True, YUE: bool =False, Testing:bool =False, UndirectionalConstraint: bool =False):
 
     try:
         #Data input
@@ -59,12 +59,13 @@ def Gurobi_Solve(InputData: InputStructure, Lazy = True, YUE: bool =False, Testi
             for j in range(N):
                 m.addConstr(x[i,j] <= InputData.A[i,j])
 
-        '''
+
         #constraint (2)
-        for i in range(N-1):
-            for j in range(i+1, N):
-                m.addConstr(x[i,j] == x[j,i])
-        '''
+        if UndirectionalConstraint == True:
+            for i in range(N-1):
+                for j in range(i+1, N):
+                    m.addConstr(x[i,j] == x[j,i])
+        
         
         #constraint (3)
         m.addConstr(gp.quicksum(x[i,j] for i in range(N) for j in range(N)) <= Lmt)

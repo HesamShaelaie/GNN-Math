@@ -32,12 +32,12 @@ def read_data(Index, INCLUDE_OLD = False, YUE=False):
     X = Info['X']
     T = Info['T']
     R = Info['R']
-    
 
     lng = empty
     lat = empty
 
-    P   = {}
+    P = {}
+    
     if YUE == True:
         lng = Info['lng']
         lat = Info['lat']

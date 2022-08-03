@@ -1,3 +1,4 @@
+from tkinter import Y
 from turtle import color
 from reading_pickles import InputStructure
 from reading_pickles import read_data
@@ -9,12 +10,14 @@ import pickle
 import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
+ 
+from mpl_toolkits.basemap import Basemap as Basemap
 
 import os
 from data_structures import OutputStructure
-import os
 
-def Draw_original(Input: InputStructure):
+
+def Draw_Graph_O(Input: InputStructure):
 
     CurrectFolder = os.path.dirname(os.path.abspath(__file__))
     GNNPICOUT = CurrectFolder + "/GNNPICOUT"
@@ -32,13 +35,29 @@ def Draw_original(Input: InputStructure):
     
     edge_colors= ["#737373","#000000","#a9b0aa","#80d189","#ccbfbe","#ccbfbe","#ccbfbe"]
 
-    for i in range(Input.n-1):
-        for j in range(i+1, Input.n):
-            if Input.A[i,j] > 0.5:
+    for i in range(Input.n):
+        for j in range(Input.n):
+            if Input.CopyA[i][j] > 0.5:
                 edgelistO.append((i,j))
                 edgelistC.append(edge_colors[1])
 
-
+    '''
+    #drawing on the map
+    plt.figure(figsize = (12,8))
+    m = Basemap(projection='merc',llcrnrlon=-160,llcrnrlat=15,urcrnrlon=-60,
+    urcrnrlat=50, lat_ts=0, resolution='l',suppress_ticks=True)
+    mx, my = m(pos_data['lon'].values, pos_data['lat'].values)
+    pos = {}
+    for count, elem in enumerate(pos_data['nodes']):
+        pos[elem] = (mx[count], my[count])
+    nx.draw_networkx_edges(G, pos = pos, edge_color='blue', alpha=0.1, arrows = False)
+    m.drawcountries(linewidth = 2)
+    m.drawstates(linewidth = 0.2)
+    m.drawcoastlines(linewidth=2)
+    plt.tight_layout()
+    plt.savefig("map.png", dpi = 300)
+    plt.show()
+    '''
 
     Positions = {}
     for x in range(Input.n):
@@ -46,7 +65,7 @@ def Draw_original(Input: InputStructure):
     
 
     node_colors= ["#232ab8","#de3737","#a9b0aa","#80d189","#ccbfbe","#ccbfbe","#ccbfbe"]
-    node_sizes = [2,5,7000,9000,11000,13000,15000]
+    node_sizes = [0.1,0.2,7000,9000,11000,13000,15000]
     node_shapes = ['s', 'o']
 
 
@@ -64,7 +83,18 @@ def Draw_original(Input: InputStructure):
             G.nodes[a]['shape'] = node_shapes[1]
 
     G.add_edges_from(edgelistO)
-    nx.draw_networkx_edges(G, Positions, edge_color=edgelistC, width=0.4)
+
+    options = {
+    'arrows': True,
+    #'node_color': 'blue',
+    #'node_size': 100,
+    #'width': 3,
+    'arrowstyle': '-|>',
+    'arrowsize': 0.1,
+    }
+
+    nx.draw_networkx_edges(G, Positions, edge_color=edgelistC, width=0.1)#, **options)
+
     '''
     for shape in set(node_shapes):
         # the nodes with the desired shapes
@@ -88,7 +118,112 @@ def Draw_original(Input: InputStructure):
                                 node_shape = shape
                             )
 
-    plt.savefig(FNAMEI, dpi=300)
+    plt.savefig(FNAMEI, dpi=1100)
+    plt.clf()
+
+
+def Draw_Graph_K(Input: InputStructure):
+
+    CurrectFolder = os.path.dirname(os.path.abspath(__file__))
+    GNNPICOUT = CurrectFolder + "/GNNPICOUT"
+
+    if not os.path.isdir(GNNPICOUT):
+        os.mkdir(GNNPICOUT)
+
+    FNAMEI = GNNPICOUT + '/' + Input.Fname + '_K.png'       # Whole nodesh and arcs
+
+    if os.path.isfile(FNAMEI):
+        os.remove(FNAMEI)
+
+    edgelistO = [] # original
+    edgelistC = [] # color of original
+    
+    edge_colors= ["#737373","#000000","#a9b0aa","#80d189","#ccbfbe","#ccbfbe","#ccbfbe"]
+
+    for i in range(Input.n):
+        for j in range(Input.n):
+            if Input.A[i][j] > 0.5:
+                edgelistO.append((i,j))
+                edgelistC.append(edge_colors[1])
+
+    '''
+    #drawing on the map
+    plt.figure(figsize = (12,8))
+    m = Basemap(projection='merc',llcrnrlon=-160,llcrnrlat=15,urcrnrlon=-60,
+    urcrnrlat=50, lat_ts=0, resolution='l',suppress_ticks=True)
+    mx, my = m(pos_data['lon'].values, pos_data['lat'].values)
+    pos = {}
+    for count, elem in enumerate(pos_data['nodes']):
+        pos[elem] = (mx[count], my[count])
+    nx.draw_networkx_edges(G, pos = pos, edge_color='blue', alpha=0.1, arrows = False)
+    m.drawcountries(linewidth = 2)
+    m.drawstates(linewidth = 0.2)
+    m.drawcoastlines(linewidth=2)
+    plt.tight_layout()
+    plt.savefig("map.png", dpi = 300)
+    plt.show()
+    '''
+
+    Positions = {}
+    for x in range(Input.n):
+        Positions[x]=(Input.Pos[x][0],Input.Pos[x][1])
+    
+
+    node_colors= ["#232ab8","#de3737","#a9b0aa","#80d189","#ccbfbe","#ccbfbe","#ccbfbe"]
+    node_sizes = [0.1,0.2,7000,9000,11000,13000,15000]
+    node_shapes = ['s', 'o']
+
+
+    G = nx.Graph()
+    G.add_nodes_from(Positions.keys())
+    for a,p in Positions.items():
+        G.nodes[a]['pos'] = p 
+        if a == Input.sr:
+            G.nodes[a]['color'] = node_colors[1]
+            G.nodes[a]['size'] = node_sizes[1]
+            G.nodes[a]['shape'] = node_shapes[0]
+        else:
+            G.nodes[a]['color'] = node_colors[0]
+            G.nodes[a]['size'] = node_sizes[0]
+            G.nodes[a]['shape'] = node_shapes[1]
+
+    G.add_edges_from(edgelistO)
+
+    options = {
+    'arrows': True,
+    #'node_color': 'blue',
+    #'node_size': 100,
+    #'width': 3,
+    'arrowstyle': '-|>',
+    'arrowsize': 0.1,
+    }
+
+    nx.draw_networkx_edges(G, Positions, edge_color=edgelistC, width=0.1)#, **options)
+
+    '''
+    for shape in set(node_shapes):
+        # the nodes with the desired shapes
+        node_list = [node for node in G.nodes() if G.nodes[node]['shape'] == shape]
+        nx.draw_networkx_nodes(G,Positions,
+                            nodelist = node_list,
+                            node_size = [G.nodes[node]['size'] for node in node_list],
+                            node_color= [G.nodes[node]['color'] for node in node_list],
+                            node_shape = shape)
+    '''
+
+    for shape in set(node_shapes):
+        # the nodes with the desired shapes
+        node_list = [node for node in G.nodes() if G.nodes[node]['shape'] == shape]
+        nx.draw_networkx_nodes(
+                                G,
+                                Positions,
+                                nodelist = node_list,
+                                node_size  = [G.nodes[node]['size'] for node in node_list],
+                                node_color = [G.nodes[node]['color'] for node in node_list],
+                                node_shape = shape
+                            )
+
+    plt.savefig(FNAMEI, dpi=1100)
     plt.clf()
     
 
@@ -117,13 +252,14 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure, WithKTwo: bool = 
     
     edge_colors= ["#737373","#000000","#a9b0aa","#80d189","#ccbfbe","#ccbfbe","#ccbfbe"]
 
-    for i in range(Input.n-1):
-        for j in range(i+1, Input.n):
-            if Output.X[i][j] > 0.5 and Input.OriginalA[i][j]>0.5:
+
+    for i in range(Input.n):
+        for j in range(Input.n):
+            if Output.X[i][j] > 0.5 and Input.A[i][j]>0.5 and i!=j:
                 edgelistO.append((i,j))
                 edgelistC.append(edge_colors[1])
                 edgelistW.append(0.3)
-            elif Input.A[i,j] > 0.5:
+            elif Input.A[i][j] > 0.5 and i!=j:
                 edgelistO.append((i,j))
                 edgelistC.append(edge_colors[0])
                 edgelistW.append(0.05)
@@ -131,12 +267,12 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure, WithKTwo: bool = 
 
     NodeES = set()
     NodeEN = set()
-    for i in range(Input.n-1):
-        for j in range(i+1, Input.n):
+    for i in range(Input.n):
+        for j in range(Input.n):
             if Output.X[i][j] > 0.5:
                 NodeES.update(set([i]))
                 NodeES.update(set([j]))
-            elif Input.A[i,j] > 0.5:
+            elif Input.A[i][j] > 0.5:
                 NodeEN.update(set([i]))
                 NodeEN.update(set([j]))
     
@@ -144,7 +280,7 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure, WithKTwo: bool = 
 
 
     Positions = {}
-    n = Input.n
+    
     for x in range(Input.n):
         Positions[x]=(Input.Pos[x][0],Input.Pos[x][1])
     
@@ -152,7 +288,6 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure, WithKTwo: bool = 
     node_colors= ["#232ab8","#c26b29","#a9b0aa","#80d189","#ccbfbe","#ccbfbe","#ccbfbe"]
     node_sizes = [0.1,0.2,7000,9000,11000,13000,15000]
     node_shapes = ['s', 'o']
-
 
     G = nx.Graph()
     G.add_nodes_from(Positions.keys())
@@ -204,19 +339,17 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure, WithKTwo: bool = 
     # ===================================================
     # ========   creating new set of data  ==============
     # ===================================================
-
-
     
     NodeNotInList = [x for x in range(Input.n) if x not in NodeES]
 
     # GETTING ALL THE NODES for the edge which are not on the map
     
     ReEdge = np.copy(Input.A)
-    for i in range(Input.n-1):
-        for j in range(i+1, Input.n):
+    for i in range(Input.n):
+        for j in range(Input.n):
             if Output.X[i][j] > 0.5:
-                ReEdge[i,j] = 0
-                ReEdge[j,i] = 0
+                ReEdge[i][j] = 0
+                
 
     # Color edge
     ALLNode = [x for x in range(Input.n)]
@@ -271,82 +404,30 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure, WithKTwo: bool = 
     pickle.dump(tmp_dic, out)
     out.close()
 
+#pems-bay-K=5-directed-A 900004
+#metr-la-K=5-directed-A 900005
 
-def ExtactingNodes():
+def ExtactingNodes_YUE():
     
-    St = 900003
-    Ed = 900004
+    St = 254
+    Ed = 255
 
     for x in range(St, Ed):
 
         InputDt = read_data(x, INCLUDE_OLD=False, YUE=False)
 
-        Draw_original(InputDt)
-        
-        cnt = 0
-        for x in range(InputDt.n):
-            for y in range(InputDt.n):
-                if InputDt.A[x,y]>0.5:
-                    cnt = cnt + 1
+        #InputDt.blank_X()
+        #InputDt.blank_T()
 
-        InputDt.Lmt = cnt + 100
+        InputDt.recalculate(K=1, ResetLimit=True, WithAdjustment=True)
 
-        TmpX  = InputDt.X
-        TmpT  = InputDt.Theta
+        Draw_Graph_O(InputDt)
+        Draw_Graph_K(InputDt)
 
-        InputDt.X = np.full((InputDt.xX, InputDt.yX), 1, dtype = np.float_)
-        InputDt.Theta = np.full((InputDt.xT, InputDt.yT), 1, dtype = np.float_)
+        ResultDt = Gurobi_Solve(InputDt, Lazy= False, YUE= True, UndirectionalConstraint=True)
 
-        ResultDt = Gurobi_Solve(InputDt, Lazy= False, YUE=True)
-
-        InputDt.X = TmpX 
-        InputDt.Theta = TmpT
-        
-        #Save data and result
-        Write_Draw(InputDt, ResultDt)
-
-
-
-def ExtactingNodes_YUE():
-    
-    St = 900003
-    Ed = 900004
-
-    for x in range(St, Ed):
-
-        InputDt = read_data(x, INCLUDE_OLD=False, YUE=True)
-
-        InputDt.A = InputDt.A@InputDt.A + InputDt.A
-        for x in range(InputDt.n):
-            for y in range(InputDt.n):
-                if InputDt.A[x][y]>0.5:
-                    InputDt.A[x][y] = 1
-                    InputDt.A[y][x] = 1
-                if x == y:
-                    InputDt.A[x][y] = 1
-                
-
-        Draw_original(InputDt)
-        
-        cnt = 0
-        for x in range(InputDt.n):
-            for y in range(InputDt.n):
-                if InputDt.A[x,y]>0.5:
-                    cnt = cnt + 1
-
-        InputDt.Lmt = cnt + 100
-
-        TmpX  = InputDt.X
-        TmpT  = InputDt.Theta
-
-        InputDt.X = np.full((InputDt.xX, InputDt.yX), 1, dtype = np.float_)
-        InputDt.Theta = np.full((InputDt.xT, InputDt.yT), 1, dtype = np.float_)
-
-        ResultDt = Gurobi_Solve(InputDt, Lazy= False, YUE= True)
-
-        InputDt.X = TmpX 
-        InputDt.Theta = TmpT
-        
+        InputDt.reset_X()
+        InputDt.reset_T()
         #Save data and result
         Write_Draw(InputDt, ResultDt, WithKTwo= True)
 

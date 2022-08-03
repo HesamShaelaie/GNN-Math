@@ -3,7 +3,7 @@ from reading_pickles import read_data
 from gurobi_eng import Gurobi_Solve
 from write_output import Write_Result
 from draw_graphs import Draw_Picture
-
+import numpy as np
 
 
 def RunMainFuntions():
@@ -57,6 +57,9 @@ def RunRealData():
     for x in range(St, Ed):
 
         InputDt = read_data(x, INCLUDE_OLD = False, YUE=True)
+        
+        InputDt.X = np.full((InputDt.xX, InputDt.yX), 1, dtype = np.float_)
+        InputDt.Theta = np.full((InputDt.xT, InputDt.yT), 1, dtype = np.float_)
 
         InputDt.recalculate(1, ResetLimit = True)
         
@@ -66,7 +69,7 @@ def RunRealData():
 
         print(ResultDt.Time)
         print("Problem solved")
-        #Save data and result
+        
         Write_Result(InputDt, ResultDt)
         Draw_Picture(InputDt, ResultDt, WithOld=False, YUE= True)
 
