@@ -32,7 +32,7 @@ def read_data(Index, INCLUDE_OLD = False, YUE=False):
     X = Info['X']
     T = Info['T']
     R = Info['R']
-    L = Info['L']
+    
 
     lng = empty
     lat = empty
@@ -44,25 +44,22 @@ def read_data(Index, INCLUDE_OLD = False, YUE=False):
         for i, (lh, lw) in enumerate(zip(lat, lng)):
             P.update({i:[lh,lw]})
     
-
         tmpA = np.shape(A)[0]
-
+        CntAm = 0
         for x in range(tmpA):
             for y in range(tmpA):
                 if A[x][y]>0.5:
-                    A[x][y]=1
-                    A[y][x]=1
-
-
-        for x in range(tmpA):
-            A[x][x]=0
-
+                    CntAm = CntAm + 1
+                
         print(np.shape(X))
         tmpX = X[0,:,:,0].transpose()
+
         X = tmpX
+        L = CntAm
 
     else:
         P = Info['P']
+        L = Info['L']
 
     n = len(A[0,:])
     cnt = 0

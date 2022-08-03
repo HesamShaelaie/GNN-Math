@@ -57,6 +57,8 @@ def RunRealData():
     for x in range(St, Ed):
         InputDt = read_data(x, INCLUDE_OLD = False, YUE=True)
 
+        InputDt.recalculate(2)
+        
         InputDt.Lmt = int(InputDt.Lmt * 0.5)
 
         #InputDt.Lmt = 20*2

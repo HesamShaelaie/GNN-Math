@@ -63,13 +63,13 @@ class InputStructure():
         self.DenA = self.CntA/self.n**2 
     
     #defualt value of the K is 2 as we got it from the original model
-    def recalculate(self, K_M: int = 1):
+    def recalculate(self, K: int = 1):
 
         tmp = np.copy(self.OriginalA)
 
-        for _ in range(1, K_M):
+        for _ in range(1, K):
             tmp = tmp @ self.OriginalA
-        
+
         self.A = tmp
         self.AA = self.A @ self.A                   #n-n . n-n = n by n
         self.AAX = self.AA @ self.X                 #n-n . n-d1 = n by d1
@@ -83,22 +83,6 @@ class InputStructure():
         self.XTW = self.XT @ self.AAXTR.transpose() #n-d2 . d2-1 = n-1
         self.AAXTR = self.AAXT[self.sr,:]           #row of n-d2 = 1 by d2
         
-
-    def CalculateObjGNN(self, K_G: int = 1):
-
-        tmp = np.copy(self.OriginalA)
-
-        for _ in range(1, K_G):
-            tmp = tmp @ self.OriginalA
-        
-        AA = tmp
-        AAX = AA @ self.X                 #n-n . n-d1 = n by d1
-        AAXT= AAX @ self.Theta            #n-d1 . d1-d2 = n by d2
-        AAXTR = AAXT[self.sr,:]           #row of n-d2 = 1 by d2
-
-        tmp_sum = np.full((self.yT, 1), 1, dtype = np.float_)
-        self.ObjGNN = AAXTR @  tmp_sum
-
     def getting_old(self, OA, OP, LN, OriginalA):
         self.OA = OA
         self.OP = OP
@@ -119,8 +103,6 @@ class InputStructure():
         print("%-20s %-15s"%("size of AAXTR:   ", self.AAXTR.shape))
         print("%-20s %-15s"%("size of XTW:   ", self.XTW.shape))
         print("===============================================")
-
-
 
 class OutputStructure():
     
