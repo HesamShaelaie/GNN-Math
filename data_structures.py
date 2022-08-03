@@ -39,7 +39,7 @@ class InputStructure():
         else:
             self.A = A
 
-        self.OriginalA = np.copy(self.A)
+        self.CopyA = np.copy(self.A)
         self.X = X
         self.Theta = T
         self.sr = R
@@ -49,6 +49,7 @@ class InputStructure():
         self.Fname = Fname
         self.Pos = P
 
+        self.OriginalA = np.empty
         self.OA = np.empty
         self.OP = {}
         self.LN = np.empty
@@ -63,12 +64,12 @@ class InputStructure():
         self.DenA = self.CntA/self.n**2 
     
     #defualt value of the K is 2 as we got it from the original model
-    def recalculate(self, K: int = 1):
+    def recalculate(self, K: int = 1, ResetLimit:bool = True):
 
-        tmp = np.copy(self.OriginalA)
+        tmp = np.copy(self.CopyA)
 
         for _ in range(1, K):
-            tmp = tmp @ self.OriginalA
+            tmp = tmp @ self.CopyA
 
         self.A = tmp
         self.AA = self.A @ self.A                   #n-n . n-n = n by n
@@ -82,6 +83,16 @@ class InputStructure():
         self.XT = self.X @ self.Theta               #n-d1 . d1-d2 = n by d2
         self.XTW = self.XT @ self.AAXTR.transpose() #n-d2 . d2-1 = n-1
         self.AAXTR = self.AAXT[self.sr,:]           #row of n-d2 = 1 by d2
+
+        CntTmp = 0
+        for x in range(self.n):
+            for y in range(self.n):
+                if self.A[x][y]>0.5:
+                    CntTmp = CntTmp + 1
+
+        self.Lmt = CntTmp
+
+
         
     def getting_old(self, OA, OP, LN, OriginalA):
         self.OA = OA
@@ -89,7 +100,6 @@ class InputStructure():
         self.On = len(OA[0,:])
         self.LN = LN
         self.OriginalA = OriginalA
-
 
     def show(self):
         print("=======   Detailed Info  ======================")
