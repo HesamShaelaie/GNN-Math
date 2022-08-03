@@ -82,15 +82,15 @@ class InputStructure():
 
         self.XT = self.X @ self.Theta               #n-d1 . d1-d2 = n by d2
         self.XTW = self.XT @ self.AAXTR.transpose() #n-d2 . d2-1 = n-1
-        self.AAXTR = self.AAXT[self.sr,:]           #row of n-d2 = 1 by d2
+        
 
         CntTmp = 0
         for x in range(self.n):
             for y in range(self.n):
                 if self.A[x][y]>0.5:
                     CntTmp = CntTmp + 1
-
-        self.Lmt = CntTmp
+        if ResetLimit:
+            self.Lmt = CntTmp
 
 
         

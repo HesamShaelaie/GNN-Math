@@ -59,17 +59,19 @@ def RunRealData():
 
         InputDt.recalculate(2, ResetLimit = True)
         
-        InputDt.Lmt = int(InputDt.Lmt)
+        InputDt.Lmt = int(InputDt.Lmt * 0.5)
 
         #InputDt.Lmt = 20*2
         #InputDt.show()
+
         ResultDt = Gurobi_Solve(InputDt, Lazy=False, YUE=True, Testing= False)
+
         print(ResultDt.Time)
         print("Problem solved")
         #Save data and result
         Write_Result(InputDt, ResultDt)
-        Draw_Picture(InputDt, ResultDt, WithOld=True, YUE= True)
+        #Draw_Picture(InputDt, ResultDt, WithOld=True, YUE= True)
 
 
 if __name__ == '__main__':
-    RunWithOld()
+    RunRealData()

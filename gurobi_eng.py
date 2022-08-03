@@ -41,7 +41,7 @@ def Gurobi_Solve(InputData: InputStructure, Lazy = True, YUE: bool =False, Testi
             for i1,j1,i2,j2 in z:
                 obj.add(InputData.XTW[Pindex]*x[i1,j1]*x[i2,j2])
 
-            if InputData.XTW[Pindex] <= 0 and YUE != True:
+            if InputData.XTW[Pindex] <= 0 and YUE != True and Testing == True:
                 cnt_negetive_trm = cnt_negetive_trm + 1
                 print("We have negative/zero coefficient in objective function!!")
                 exit(3355)
@@ -273,7 +273,7 @@ if __name__ == '__main__':
 
         InputDt = read_data(x, INCLUDE_OLD=False, YUE=True)
 
-        #InputDt.Lmt = int(InputDt.Lmt*0.2)
+        InputDt.Lmt = int(InputDt.Lmt*0.2)
 
         print('InputDt.Lmt:     %d'%InputDt.Lmt)
         print('InputDt.CntA:    %d'%InputDt.CntA)
