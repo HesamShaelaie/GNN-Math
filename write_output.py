@@ -44,7 +44,7 @@ def Write_Result(Input: InputStructure, Output: OutputStructure):
 
          with open(general_info, 'w') as f_object:  
             writer = csv.writer(f_object)
-            header = ['name', 'Time', 'Duration', 'Obj','Obj-GNN','Obj-MO','#Q','Size-A','Den-A','Cnt-A','Lim','Size-X-x','Size-X-y', 'Size-T-x', 'Size-T-y', 'R']
+            header = ['name', 'Time', 'Duration', 'Obj','Obj-GNN','Obj-MO','#Q','Size-A','Den-AO','Cnt-AO', 'Den-AK','Cnt-AK' ,'Lim','CntX', 'Size-X-x','Size-X-y', 'Size-T-x', 'Size-T-y', 'R']
             writer.writerow(header)
             
     # Pre-requisite - The CSV file should be manually closed before running this code.
@@ -71,9 +71,14 @@ def Write_Result(Input: InputStructure, Output: OutputStructure):
                         Output.ObjMO,   #objective function of MO
                         Output.NQ,      #number of quadratic terms in objective function
                         Input.n,        #size-A
-                        Input.DenA,     #Den-A
-                        Input.CntA,     #Cnt-A  number of eadge in matrix A
+                        Input.DenAO,     #Den-A
+                        Input.CntAO,     #Cnt-A  number of eadge in matrix A
+
+                        Input.DenAK,     #Den-A
+                        Input.CntAK,     #Cnt-A  number of eadge in matrix A
+
                         Input.Lmt,      #Lim on the number of eadge in submatrix
+                        Output.CntX,     #number of edges used in the answer
 
                         Input.xX,      #size x x
                         Input.yX,      #size x y

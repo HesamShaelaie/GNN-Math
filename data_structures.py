@@ -44,7 +44,7 @@ class InputStructure():
         self.Theta = T
         self.sr = R
         self.Lmt = L
-        self.DenA = 0.0
+        self.DenAO = 0.0
         self.Path = Path
         self.Fname = Fname
         self.Pos = P
@@ -54,19 +54,22 @@ class InputStructure():
         self.OP = {}
         self.LN = np.empty
         self.On = -1
-        
-        self.CntA = 0
+        self.K = -1 
+
+        self.CntAO = 0
         for x in range(self.n):
             for y in range(self.n):
-                if self.A[x,y]>0.5:
-                    self.CntA = self.CntA + 1
+                if self.CopyA[x][y]>0.5:
+                    self.CntAO = self.CntAO + 1
 
-        self.DenA = self.CntA/self.n**2 
+        self.DenAO = float(self.CntAO)/self.n**2 
     
     #defualt value of the K is 2 as we got it from the original model
     def recalculate(self, K: int = 1, ResetLimit:bool = True):
 
         tmp = np.copy(self.CopyA)
+
+        self.K = K
 
         for _ in range(1, K):
             tmp = tmp @ self.CopyA
@@ -84,14 +87,16 @@ class InputStructure():
         self.XTW = self.XT @ self.AAXTR.transpose() #n-d2 . d2-1 = n-1
         
 
-        CntTmp = 0
+        self.CntAK = 0
         for x in range(self.n):
             for y in range(self.n):
                 if self.A[x][y]>0.5:
-                    CntTmp = CntTmp + 1
-        if ResetLimit:
-            self.Lmt = CntTmp
+                    self.CntAK = self.CntAK + 1
 
+        self.DenAK = float(self.CntAK)/self.n**2         
+
+        if ResetLimit:
+            self.Lmt = self.CntAK
 
         
     def getting_old(self, OA, OP, LN, OriginalA):
@@ -122,6 +127,7 @@ class OutputStructure():
         self.X = any
         self.ObjMO = 0.0
         self.Time =0.0
+        self.CntX = 0
 
     def SetNumberQ(self, tmp: np.int16):
         self.NQ = tmp

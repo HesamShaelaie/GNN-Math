@@ -153,6 +153,13 @@ def Gurobi_Solve(InputData: InputStructure, Lazy = True, YUE: bool =False, Testi
             OutData.ObjMO = tmp_ObjMO
 
         OutData.Obj = m.objVal
+
+        OutData.CntX = 0
+        for x in range(InputData.n):
+            for y in range(InputData.n):
+                if OutData.X[x][y]>0.5:
+                    OutData.CntX = OutData.CntX + 1
+        
         
         # testing the solution
         if Lazy == True:
