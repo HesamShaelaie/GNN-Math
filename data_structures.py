@@ -28,9 +28,6 @@ class InputStructure():
             print("self.yX != self.xT")
             exit(33)
         
-
-        
-        
         self.A = any
         if type(A[0][0]==bool):
             self.A = np.full((self.n, self.n), 0, dtype = np.float_)
@@ -117,7 +114,7 @@ class InputStructure():
 
         self.XT = self.X @ self.Theta               #n-d1 . d1-d2 = n by d2
         self.XTW = self.XT @ self.AAXTR.transpose() #n-d2 . d2-1 = n-1
-        self.AAXTR = self.AAXT[self.sr,:]           #row of n-d2 = 1 by d2
+        
         
         self.CntAK = 0
         for x in range(self.n):

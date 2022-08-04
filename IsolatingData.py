@@ -278,12 +278,10 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure, WithKTwo: bool = 
     
     NodeEN = NodeEN - NodeES
 
-
     Positions = {}
     
     for x in range(Input.n):
         Positions[x]=(Input.Pos[x][0],Input.Pos[x][1])
-    
 
     node_colors= ["#232ab8","#c26b29","#a9b0aa","#80d189","#ccbfbe","#ccbfbe","#ccbfbe"]
     node_sizes = [0.1,0.2,7000,9000,11000,13000,15000]
@@ -440,8 +438,6 @@ def ExtactingNodes_YUE():
 
 
 def Somecheckings(InputDt: InputStructure):
-
-
 
     CntB = 0
     for x in range(InputDt.n):
