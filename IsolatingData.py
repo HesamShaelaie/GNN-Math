@@ -274,8 +274,8 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure, WithKTwo: bool = 
 
 def ExtactingNodes():
     
-    St = 900003
-    Ed = 900004
+    St = 254
+    Ed = 255
 
     for x in range(St, Ed):
 
@@ -352,5 +352,5 @@ def ExtactingNodes_YUE():
 
 
 if __name__ == '__main__':
-    #ExtactingNodes()
-    ExtactingNodes_YUE()
+    ExtactingNodes()
+    #ExtactingNodes_YUE()
