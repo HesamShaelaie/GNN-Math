@@ -422,14 +422,12 @@ def ExtactingNodes_YUE():
         
         InputDt.recalculate(K=1, ResetLimit=True, WithAdjustment=True)
 
-        
         Somecheckings(InputDt)
-
         
         Draw_Graph_O(InputDt)
         Draw_Graph_K(InputDt)
 
-        ResultDt = Gurobi_Solve(InputDt, Lazy= False, YUE= True, UndirectionalConstraint=True)
+        ResultDt = Gurobi_Solve(InputDt, Lazy= False, YUE= False, UndirectionalConstraint=True, Testing= True)
 
         InputDt.reset_X()
         InputDt.reset_T()
