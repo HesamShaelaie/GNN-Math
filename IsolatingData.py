@@ -246,6 +246,7 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure, WithKTwo: bool = 
     if os.path.isfile(FNAMED):
         os.remove(FNAMED)
     
+
     edgelistO = []
     edgelistC = []
     edgelistW = []
@@ -253,20 +254,21 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure, WithKTwo: bool = 
     edge_colors= ["#737373","#000000","#a9b0aa","#80d189","#ccbfbe","#ccbfbe","#ccbfbe"]
 
 
-    for i in range(Input.n):
-        for j in range(Input.n):
-            if Output.X[i][j] > 0.5 and Input.A[i][j]>0.5:
+    for i in range(Input.n-1):
+        for j in range(i+1,Input.n):
+            if Output.X[i][j] > 0.5 or Output.X[j][i] > 0.5:
                 edgelistO.append((i,j))
                 edgelistC.append(edge_colors[1])
                 edgelistW.append(0.3)
-            elif Input.A[i][j] > 0.5:
+            elif Input.A[i][j] > 0.5 or Input.A[j][i] > 0.5: 
                 edgelistO.append((i,j))
                 edgelistC.append(edge_colors[0])
                 edgelistW.append(0.05)
-
+   
 
     NodeES = set()
     NodeEN = set()
+
     for i in range(Input.n):
         for j in range(Input.n):
             if Output.X[i][j] > 0.5:
@@ -408,26 +410,27 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure, WithKTwo: bool = 
 
 def ExtactingNodes_YUE():
     
-    St = 254
-    Ed = 255
+    St = 900004
+    Ed = 900005
 
     for x in range(St, Ed):
 
-        InputDt = read_data(x, INCLUDE_OLD=False, YUE=False)
+        InputDt = read_data(x, INCLUDE_OLD=False, YUE=True)
 
         InputDt.blank_X()
         InputDt.blank_T()
 
-        Somecheckings(InputDt)
+        #Somecheckings(InputDt)
         
-        InputDt.recalculate(K=1, ResetLimit=True, WithAdjustment=True)
+        InputDt.recalculate(K=2, ResetLimit=True, WithAdjustment=True)
 
-        Somecheckings(InputDt)
+        #Somecheckings(InputDt)
         
         Draw_Graph_O(InputDt)
         Draw_Graph_K(InputDt)
 
-        ResultDt = Gurobi_Solve(InputDt, Lazy= False, YUE= False, UndirectionalConstraint=True, Testing= True)
+        #ResultDt = Gurobi_Solve(InputDt, Lazy= False, YUE= False, UndirectionalConstraint=True, Testing= True)
+        ResultDt = Gurobi_Solve(InputDt, Lazy= False, YUE= True, UndirectionalConstraint=False, Testing= False)
 
         InputDt.reset_X()
         InputDt.reset_T()
