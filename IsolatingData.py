@@ -416,6 +416,7 @@ def ExtactingNodes_YUE():
     for x in range(St, Ed):
 
         InputDt = read_data(x, INCLUDE_OLD=False, YUE=True)
+        
 
         InputDt.blank_X()
         InputDt.blank_T()
@@ -424,6 +425,7 @@ def ExtactingNodes_YUE():
         
         InputDt.recalculate(K=2, ResetLimit=True, WithAdjustment=True)
 
+        SecondaryCheck(InputDt)
         #Somecheckings(InputDt)
         
         Draw_Graph_O(InputDt)
@@ -452,13 +454,36 @@ def Somecheckings(InputDt: InputStructure):
         for y in range(InputDt.n):
             if InputDt.A[x][y]>0.5:
                 if InputDt.A[y][x]<0.5:
-                    print("Nashod!!")
+                    print("In un directed graph there is a problem!!")
                     exit(33)
     
     for x in range(InputDt.n):
         if InputDt.A[x][x]> 0.5:
-            print("ey baba!!")
+            print("diagnal is not zero!!")
             exit(33)
+
+def SecondaryCheck(InputDt: InputStructure):
+
+    n = InputDt.n
+    A = np.copy(InputDt.CopyA)
+    B = A@A
+
+    r = InputDt.sr
+
+    for x in range(n):
+        B[x][x] = 0
+
+    cnt = 0 
+    for y in range(n):
+        if B[r][y]>0.5:
+            cnt = cnt + 1
+    
+    for x in range(n):
+        if B[x][r]>0.5:
+            cnt = cnt + 1
+
+    print("hub can reach to (%d)"%(cnt))
+    exit(3)
 
 if __name__ == '__main__':
     #ExtactingNodes()
