@@ -39,7 +39,10 @@ class InputStructure():
         else:
             self.A = A
 
-        self.OriginalA = np.copy(self.A)
+        self.CopyA = np.copy(self.A)
+        self.CopyX = np.copy(X)
+        self.CopyTheta = np.copy(T)
+
         self.X = X
         self.Theta = T
         self.sr = R
@@ -82,7 +85,7 @@ class InputStructure():
             print("self.ERR_A_Diagonal != 0  or self.ERR_A_Symmetry != 0")
             exit(31)
             
-        
+        '''
         self.DenA = self.CntA/self.n**2 
         self.AA = self.A @ self.A                   #n-n . n-n = n by n
         self.AAX = self.AA @ self.X                 #n-n . n-d1 = n by d1
@@ -95,17 +98,36 @@ class InputStructure():
         self.XT = self.X @ self.Theta               #n-d1 . d1-d2 = n by d2
         self.XTW = self.XT @ self.AAXTR.transpose() #n-d2 . d2-1 = n-1
         self.AAXTR = self.AAXT[self.sr,:]           #row of n-d2 = 1 by d2
+        
+        '''
+    def reset_A(self):
+        self.A = np.copy(self.CopyA)
+
+    def set_A(self, tmp):
+        self.A = tmp
     
+    def blank_X(self):
+        self.X = np.full((self.xX, self.yX), 1, dtype = np.float_)
+        
+    def blank_T(self):
+        self.Theta = np.full((self.xT, self.yT), 1, dtype = np.float_)
+
+    def reset_X(self):
+        self.X = np.copy(self.CopyX)
+
+    def reset_T(self):
+        self.Theta = np.copy(self.CopyTheta)
 
 
     #defualt value of the K is 2 as we got it from the original model
-    def recalculate(self, k: int = 2):
+    def recalculate(self, K: int = 1):
 
         tmp = np.copy(self.A)
-        for _ in range(k):
+        for _ in range(1,K):
             tmp = tmp @ self.A                   
 
-        self.AA = tmp                               #n-n . n-n = n by n
+        self.A = tmp
+        self.AA = self.A @ self.A                   #n-n . n-n = n by n
         self.AAX = self.AA @ self.X                 #n-n . n-d1 = n by d1
         self.AAXT= self.AAX @ self.Theta            #n-d1 . d1-d2 = n by d2
         self.AAXTR = self.AAXT[self.sr,:]           #row of n-d2 = 1 by d2

@@ -119,40 +119,37 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure, WithKTwo: bool = 
 
     for i in range(Input.n-1):
         for j in range(i+1, Input.n):
-            if Output.X[i][j] > 0.5 and Input.OriginalA[i][j]>0.5:
+            if Output.X[i][j] > 0.5:
                 edgelistO.append((i,j))
                 edgelistC.append(edge_colors[1])
                 edgelistW.append(0.3)
-            elif Input.A[i,j] > 0.5:
+            elif Input.A[i][j] > 0.5:
                 edgelistO.append((i,j))
                 edgelistC.append(edge_colors[0])
                 edgelistW.append(0.05)
 
-
     NodeES = set()
     NodeEN = set()
+
     for i in range(Input.n-1):
         for j in range(i+1, Input.n):
             if Output.X[i][j] > 0.5:
                 NodeES.update(set([i]))
                 NodeES.update(set([j]))
-            elif Input.A[i,j] > 0.5:
+            elif Input.A[i][j] > 0.5:
                 NodeEN.update(set([i]))
                 NodeEN.update(set([j]))
     
     NodeEN = NodeEN - NodeES
-
 
     Positions = {}
     n = Input.n
     for x in range(Input.n):
         Positions[x]=(Input.Pos[x][0],Input.Pos[x][1])
     
-
     node_colors= ["#232ab8","#c26b29","#a9b0aa","#80d189","#ccbfbe","#ccbfbe","#ccbfbe"]
     node_sizes = [0.1,0.2,7000,9000,11000,13000,15000]
     node_shapes = ['s', 'o']
-
 
     G = nx.Graph()
     G.add_nodes_from(Positions.keys())
@@ -200,7 +197,7 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure, WithKTwo: bool = 
 
     plt.savefig(FNAMEI, dpi=1000)
     plt.clf()
-
+    
     # ===================================================
     # ========   creating new set of data  ==============
     # ===================================================
@@ -245,7 +242,7 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure, WithKTwo: bool = 
     New_A = np.delete(New_A,NodeNotInList, 0)
     New_A = np.delete(New_A,NodeNotInList, 1)
 
-    New_OrgA = np.copy(Input.OriginalA)
+    New_OrgA = np.copy(Input.CopyA)
 
     New_OrgA = np.delete(New_OrgA,NodeNotInList, 0)
     New_OrgA = np.delete(New_OrgA,NodeNotInList, 1)
@@ -291,17 +288,16 @@ def ExtactingNodes():
 
         InputDt.Lmt = cnt + 100
 
-        TmpX  = InputDt.X
-        TmpT  = InputDt.Theta
+        InputDt.blank_X()
+        InputDt.blank_T()
 
-        InputDt.X = np.full((InputDt.xX, InputDt.yX), 1, dtype = np.float_)
-        InputDt.Theta = np.full((InputDt.xT, InputDt.yT), 1, dtype = np.float_)
+        InputDt.recalculate(K=1)
 
         ResultDt = Gurobi_Solve(InputDt, Lazy= False, YUE=True)
 
-        InputDt.X = TmpX 
-        InputDt.Theta = TmpT
-        
+        InputDt.reset_X()
+        InputDt.reset_T()
+
         #Save data and result
         Write_Draw(InputDt, ResultDt)
 
