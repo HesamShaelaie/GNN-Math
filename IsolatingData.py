@@ -473,6 +473,8 @@ def SecondaryCheck(InputDt: InputStructure):
     for x in range(n):
         B[x][x] = 0
 
+        
+
     cnt = 0 
     for y in range(n):
         if B[r][y]>0.5:
