@@ -37,7 +37,7 @@ def read_data(Index, INCLUDE_OLD = False, YUE=False):
     lat = empty
 
     P = {}
-    
+
     if YUE == True:
         lng = Info['lng']
         lat = Info['lat']
@@ -65,7 +65,7 @@ def read_data(Index, INCLUDE_OLD = False, YUE=False):
     cnt = 0
     for x in range(n):
         for y in range(n):
-            if A[x,y]>0.5:
+            if A[x][y]>0.5:
                 cnt = cnt + 1
     
     if cnt < L:
@@ -81,8 +81,22 @@ def read_data(Index, INCLUDE_OLD = False, YUE=False):
     return InputDt
 
 if __name__ == '__main__':
-    InputDt = read_data(900003, INCLUDE_OLD = False, YUE = True)
+    InputDt = read_data(254, INCLUDE_OLD = False, YUE = False)
+
+    CntA = 0
+    CntB = 0
+    for x in range(InputDt.n):
+        for y in range(InputDt.n):
+            if InputDt.A[x][y]>0.5:
+                CntA = CntA + 1
     
+    for x in range(InputDt.n):
+        for y in range(InputDt.n):
+            if InputDt.A[x, y]>0.5:
+                CntB = CntB + 1
+    
+    print(CntA)
+    print(CntB)
 
     #InputDt.show()
 

@@ -255,11 +255,11 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure, WithKTwo: bool = 
 
     for i in range(Input.n):
         for j in range(Input.n):
-            if Output.X[i][j] > 0.5 and Input.A[i][j]>0.5 and i!=j:
+            if Output.X[i][j] > 0.5 and Input.A[i][j]>0.5:
                 edgelistO.append((i,j))
                 edgelistC.append(edge_colors[1])
                 edgelistW.append(0.3)
-            elif Input.A[i][j] > 0.5 and i!=j:
+            elif Input.A[i][j] > 0.5:
                 edgelistO.append((i,j))
                 edgelistC.append(edge_colors[0])
                 edgelistW.append(0.05)
@@ -335,7 +335,8 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure, WithKTwo: bool = 
 
     plt.savefig(FNAMEI, dpi=1000)
     plt.clf()
-
+    
+    exit(3)
     # ===================================================
     # ========   creating new set of data  ==============
     # ===================================================
@@ -416,11 +417,17 @@ def ExtactingNodes_YUE():
 
         InputDt = read_data(x, INCLUDE_OLD=False, YUE=False)
 
-        #InputDt.blank_X()
-        #InputDt.blank_T()
+        InputDt.blank_X()
+        InputDt.blank_T()
 
+        Somecheckings(InputDt)
+        
         InputDt.recalculate(K=1, ResetLimit=True, WithAdjustment=True)
 
+        
+        Somecheckings(InputDt)
+
+        
         Draw_Graph_O(InputDt)
         Draw_Graph_K(InputDt)
 
@@ -431,6 +438,30 @@ def ExtactingNodes_YUE():
         #Save data and result
         Write_Draw(InputDt, ResultDt, WithKTwo= True)
 
+
+def Somecheckings(InputDt: InputStructure):
+
+
+
+    CntB = 0
+    for x in range(InputDt.n):
+        for y in range(InputDt.n):
+            if InputDt.A[x][y]>0.5:
+                CntB = CntB + 1
+    
+    print("the total is %d"%CntB)
+
+    for x in range(InputDt.n):
+        for y in range(InputDt.n):
+            if InputDt.A[x][y]>0.5:
+                if InputDt.A[y][x]<0.5:
+                    print("Nashod!!")
+                    exit(33)
+    
+    for x in range(InputDt.n):
+        if InputDt.A[x][x]> 0.5:
+            print("ey baba!!")
+            exit(33)
 
 if __name__ == '__main__':
     #ExtactingNodes()

@@ -57,18 +57,18 @@ def Gurobi_Solve(InputData: InputStructure, Lazy = True, YUE: bool =False, Testi
         # Constraint (1)
         for i in range(N):
             for j in range(N):
-                m.addConstr(x[i,j] <= InputData.A[i,j])
+                m.addConstr(x[i][j] <= InputData.A[i][j])
 
 
         #constraint (2)
         if UndirectionalConstraint == True:
             for i in range(N-1):
                 for j in range(i+1, N):
-                    m.addConstr(x[i,j] == x[j,i])
+                    m.addConstr(x[i][j] == x[j][i])
         
         
         #constraint (3)
-        m.addConstr(gp.quicksum(x[i,j] for i in range(N) for j in range(N)) <= Lmt)
+        m.addConstr(gp.quicksum(x[i][j] for i in range(N) for j in range(N)) <= Lmt)
 
         # lazy optimization parameters
         m.Params.LazyConstraints = 1
