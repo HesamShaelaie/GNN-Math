@@ -90,21 +90,34 @@ class InputStructure():
         self.Theta = np.copy(self.CopyTheta)
 
     #defualt value of the K is 2 as we got it from the original model
-    def recalculate(self, K: int = 1, ResetLimit:bool = True, WithAdjustment:bool = True):
-
-        tmp = np.copy(self.A)
-
+    def recalculate(self, K: int = 1, Rho: int = 1, ResetLimit:bool = True, WithAdjustment:bool = True):
+        
         self.K = K
+        self.Rho = Rho
 
+        tmpAA = np.copy(self.A)
         for _ in range(1, K):
-            tmp = tmp @ self.A
+            tmpAA = tmpAA @ self.A
+
+        tmpA = np.empty
+        for x in range(1, Rho+1):
+            
+            if x == 1:
+                tmpA = np.copy(self.A)
+            else:
+                tmp = np.copy(self.A)
+                for y in range(1,x):
+                    tmp = tmp @ self.A
+
+                tmpA = tmpA + tmp
 
         if WithAdjustment:
             for x in range(self.n):
-                tmp[x][x] = 0
+                tmpA[x][x] = 0
+                tmpAA[x][x] = 0
 
-        self.A = tmp
-        self.AA = self.A @ self.A                   #n-n . n-n = n by n
+        self.A = tmpA
+        self.AA = tmpAA
         self.AAX = self.AA @ self.X                 #n-n . n-d1 = n by d1
         self.AAXT= self.AAX @ self.Theta            #n-d1 . d1-d2 = n by d2
         self.AAXTR = self.AAXT[self.sr,:]           #row of n-d2 = 1 by d2

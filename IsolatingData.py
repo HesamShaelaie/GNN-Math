@@ -6,11 +6,13 @@ from gurobi_eng import Gurobi_Solve
 import pylab
 import os
 import pickle
+import ssl
 
 import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
- 
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
 from mpl_toolkits.basemap import Basemap as Basemap
 
 import os
@@ -142,7 +144,7 @@ def Draw_Graph_K(Input: InputStructure):
 
     for i in range(Input.n):
         for j in range(Input.n):
-            if Input.A[i][j] > 0.5:
+            if Input.AA[i][j] > 0.5:
                 edgelistO.append((i,j))
                 edgelistC.append(edge_colors[1])
 
@@ -227,7 +229,7 @@ def Draw_Graph_K(Input: InputStructure):
     plt.clf()
     
 
-def Write_Draw(Input: InputStructure, Output: OutputStructure, WithKTwo: bool = False):
+def Write_Draw(Input: InputStructure, Output: OutputStructure):
 
     CurrectFolder = os.path.dirname(os.path.abspath(__file__))
     GNNPICOUT = CurrectFolder + "/GNNPICOUT"
@@ -245,7 +247,6 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure, WithKTwo: bool = 
 
     if os.path.isfile(FNAMED):
         os.remove(FNAMED)
-    
 
     edgelistO = []
     edgelistC = []
@@ -408,7 +409,158 @@ def Write_Draw(Input: InputStructure, Output: OutputStructure, WithKTwo: bool = 
 #pems-bay-K=5-directed-A 900004
 #metr-la-K=5-directed-A 900005
 
+
+def DrawOnMap(Input: InputStructure, Output: OutputStructure, WithKTwo: bool = False):
+
+    CurrectFolder = os.path.dirname(os.path.abspath(__file__))
+    GNNPICOUT = CurrectFolder + "/GNNPICOUT"
+    GNNINPUT = CurrectFolder + "/GNNINPUT"
+
+    if not os.path.isdir(GNNPICOUT):
+        os.mkdir(GNNPICOUT)
+
+    FNAMEI = GNNPICOUT + '/' + Input.Fname + '_M.png'
+    
+
+
+    if os.path.isfile(FNAMEI):
+        os.remove(FNAMEI)
+
+    edgelistO = []
+    edgelistC = []
+    edgelistW = []
+    
+    edge_colors= ["#737373","#000000","#a9b0aa","#80d189","#ccbfbe","#ccbfbe","#ccbfbe"]
+
+
+    for i in range(Input.n-1):
+        for j in range(i+1,Input.n):
+            if Output.X[i][j] > 0.5 or Output.X[j][i] > 0.5:
+                edgelistO.append((i,j))
+                edgelistC.append(edge_colors[1])
+                edgelistW.append(0.3)
+            elif Input.A[i][j] > 0.5 or Input.A[j][i] > 0.5: 
+                edgelistO.append((i,j))
+                edgelistC.append(edge_colors[0])
+                edgelistW.append(0.05)
+   
+
+    NodeES = set()
+    NodeEN = set()
+
+    for i in range(Input.n):
+        for j in range(Input.n):
+            if Output.X[i][j] > 0.5:
+                NodeES.update(set([i]))
+                NodeES.update(set([j]))
+            elif Input.A[i][j] > 0.5:
+                NodeEN.update(set([i]))
+                NodeEN.update(set([j]))
+    
+    NodeEN = NodeEN - NodeES
+
+    MinLat = Input.Pos[0][0]
+    MinLon = Input.Pos[0][1]
+
+    MaxLat = Input.Pos[0][0]
+    MaxLon = Input.Pos[0][1]
+
+    for x in range(Input.n):
+        if MinLat > Input.Pos[x][0]:
+            MinLat = Input.Pos[x][0]
+
+        if MaxLat < Input.Pos[x][0]:
+            MaxLat = Input.Pos[x][0]
+
+        if MinLon > Input.Pos[x][1]:
+            MinLon = Input.Pos[x][1]
+
+        if MaxLon < Input.Pos[x][1]:
+            MaxLon = Input.Pos[x][1]
+        
+
+    m = Basemap(
+        projection='merc',
+        llcrnrlon=MinLon,
+        llcrnrlat=MinLat,
+        urcrnrlon=MaxLon,
+        urcrnrlat=MaxLat,
+        lat_ts=0,
+        epsg = 3309,
+        resolution='i',
+        suppress_ticks=True)
+
+    m.arcgisimage(service='ESRI_StreetMap_World_2D', xpixels = 12000, verbose= True)
+    Positions = {}
+
+
+    lats = [Input.Pos[x][0] for x in range(Input.n)]
+    lons = [Input.Pos[x][1] for x in range(Input.n)]
+    
+    mx,my=m(lons,lats)
+
+    for x in range(Input.n):
+        Positions[x]=(mx[x],my[x])
+
+    node_colors= ["#232ab8","#c26b29","#a9b0aa","#80d189","#ccbfbe","#ccbfbe","#ccbfbe"]
+    node_sizes = [0.1,0.2,7000,9000,11000,13000,15000]
+    node_shapes = ['s', 'o']
+
+    G = nx.Graph()
+    G.add_nodes_from(Positions.keys())
+    for a,p in Positions.items():
+        G.nodes[a]['pos'] = p 
+        if a == Input.sr:
+            G.nodes[a]['color'] = node_colors[1]
+            G.nodes[a]['size'] = node_sizes[1]
+            G.nodes[a]['shape'] = node_shapes[0]
+        elif a in NodeES:
+            G.nodes[a]['color'] = node_colors[0]
+            G.nodes[a]['size'] = node_sizes[0]
+            G.nodes[a]['shape'] = node_shapes[1]
+        else:
+            G.nodes[a]['color'] = node_colors[2]
+            G.nodes[a]['size'] = node_sizes[0]
+            G.nodes[a]['shape'] = node_shapes[1]
+
+    G.add_edges_from(edgelistO)
+
+    #nx.draw(G, Positions)
+    nx.draw_networkx_edges(G, Positions, edge_color=edgelistC, width = edgelistW)
+    '''
+    for shape in set(node_shapes):
+        # the nodes with the desired shapes
+        node_list = [node for node in G.nodes() if G.nodes[node]['shape'] == shape]
+        nx.draw_networkx_nodes(G,Positions,
+                            nodelist = node_list,
+                            node_size = [G.nodes[node]['size'] for node in node_list],
+                            node_color= [G.nodes[node]['color'] for node in node_list],
+                            node_shape = shape)
+    '''
+
+    for shape in set(node_shapes):
+        # the nodes with the desired shapes
+        node_list = [node for node in G.nodes() if G.nodes[node]['shape'] == shape]
+        nx.draw_networkx_nodes(
+                                G,
+                                Positions,
+                                nodelist = node_list,
+                                node_size  = [G.nodes[node]['size'] for node in node_list],
+                                node_color = [G.nodes[node]['color'] for node in node_list],
+                                node_shape = shape
+                            )
+
+    # Now draw the map
+    m.drawcountries()
+    m.drawstates()
+    m.bluemarble()
+    plt.savefig(FNAMEI, dpi=1000)
+    plt.clf()
+    
+
+
 def ExtactingNodes_YUE():
+    
     
     St = 900004
     Ed = 900005
@@ -423,20 +575,34 @@ def ExtactingNodes_YUE():
 
         #Somecheckings(InputDt)
         
-        InputDt.recalculate(K=2, ResetLimit=True, WithAdjustment=True)
+        InputDt.recalculate(K=5, Rho=3, ResetLimit=True, WithAdjustment=True)
 
-        SecondaryCheck(InputDt)
+        #SecondaryCheck(InputDt)
+        #FindMaxNeighbours(InputDt)
+        
+        InputDt.sr = 5
+        #InputDt.recalculate(K=2, ResetLimit=True, WithAdjustment=True)
+
+        DrawBasedOnA(InputDt)
+        #SecondaryCheck(InputDt)
+        #FindMaxNeighbours(InputDt)
+
         #Somecheckings(InputDt)
         
         Draw_Graph_O(InputDt)
         Draw_Graph_K(InputDt)
+        InputDt.Lmt = 654
 
         #ResultDt = Gurobi_Solve(InputDt, Lazy= False, YUE= False, UndirectionalConstraint=True, Testing= True)
-        ResultDt = Gurobi_Solve(InputDt, Lazy= False, YUE= True, UndirectionalConstraint=False, Testing= False)
+        ResultDt = Gurobi_Solve(InputDt, Lazy= False, UndirectionalConstraint=False)
+
+        Write_X_Only_Nodes(InputDt, ResultDt)
 
         InputDt.reset_X()
         InputDt.reset_T()
         #Save data and result
+        print("CntX= %d"%ResultDt.CntX)
+        #DrawOnMap(InputDt, ResultDt, WithKTwo= True)
         Write_Draw(InputDt, ResultDt, WithKTwo= True)
 
 
@@ -463,17 +629,17 @@ def Somecheckings(InputDt: InputStructure):
             exit(33)
 
 def SecondaryCheck(InputDt: InputStructure):
+    k = InputDt.K
+    k = k*2
 
     n = InputDt.n
-    A = np.copy(InputDt.CopyA)
+    A = np.copy(InputDt.A)
     B = A@A
 
     r = InputDt.sr
 
     for x in range(n):
         B[x][x] = 0
-
-        
 
     cnt = 0 
     for y in range(n):
@@ -484,8 +650,254 @@ def SecondaryCheck(InputDt: InputStructure):
         if B[x][r]>0.5:
             cnt = cnt + 1
 
-    print("hub can reach to (%d)"%(cnt))
-    exit(3)
+    print("Hub (%d) have (%d) neighbours at K=%d "%(r, cnt, k))
+    
+
+
+def FindMaxNeighbours(InputDt: InputStructure):
+
+    k = InputDt.K
+    k = k*2
+    n = InputDt.n
+    A = np.copy(InputDt.A)
+    B = A@A
+
+    r = InputDt.sr
+
+    Max = -1
+    IndxR = -1
+
+    for x in range(n):
+        B[x][x] = 0
+
+    for r in range(n):
+        cnt = 0 
+        for y in range(n):
+            if B[r][y]>0.5:
+                cnt = cnt + 1
+        
+        for x in range(n):
+            if B[x][r]>0.5:
+                cnt = cnt + 1
+
+        if Max < cnt:
+            Max = cnt
+            IndexR = cnt
+
+    print("Max neightbours belong to Hub (%d) with (%d) neighbours at K=%d "%(IndexR, Max, k))
+    
+def DrawBasedOnA(Input: InputStructure):
+
+    CurrectFolder = os.path.dirname(os.path.abspath(__file__))
+    GNNPICOUT = CurrectFolder + "/GNNPICOUT"
+    GNNINPUT = CurrectFolder + "/GNNINPUT"
+
+    if not os.path.isdir(GNNPICOUT):
+        os.mkdir(GNNPICOUT)
+
+    FNAMEI = GNNPICOUT + '/' + Input.Fname + '_A.png'
+
+
+    if os.path.isfile(FNAMEI):
+        os.remove(FNAMEI)
+
+
+    edgelistO = []
+    edgelistC = []
+    edgelistW = []
+    
+    edge_colors= ["#737373","#000000","#a9b0aa","#80d189","#ccbfbe","#ccbfbe","#ccbfbe"]
+
+    A = np.copy(Input.A)
+    for i in range(Input.n-1):
+        for j in range(i+1,Input.n):
+            if (i== Input.sr or j==Input.sr) and (A[i][j] > 0.5 or A[j][i] > 0.5):
+                edgelistO.append((i,j))
+                edgelistC.append(edge_colors[1])
+                edgelistW.append(0.3)
+            elif Input.A[i][j] > 0.5 or Input.A[j][i] > 0.5: 
+                edgelistO.append((i,j))
+                edgelistC.append(edge_colors[0])
+                edgelistW.append(0.05)
+   
+
+    NodeES = set()
+    NodeEN = set()
+
+    for i in range(Input.n):
+        for j in range(Input.n):
+            if (i==Input.sr or j==Input.sr) and A[i][j] > 0.5:
+                NodeES.update(set([i]))
+                NodeES.update(set([j]))
+            elif Input.A[i][j] > 0.5:
+                NodeEN.update(set([i]))
+                NodeEN.update(set([j]))
+    
+    NodeEN = NodeEN - NodeES
+
+    Positions = {}
+    
+    for x in range(Input.n):
+        Positions[x]=(Input.Pos[x][0],Input.Pos[x][1])
+
+    node_colors= ["#232ab8","#c26b29","#a9b0aa","#80d189","#ccbfbe","#ccbfbe","#ccbfbe"]
+    node_sizes = [0.1,0.2,7000,9000,11000,13000,15000]
+    node_shapes = ['s', 'o']
+
+    G = nx.Graph()
+    G.add_nodes_from(Positions.keys())
+    for a,p in Positions.items():
+        G.nodes[a]['pos'] = p 
+        if a == Input.sr:
+            G.nodes[a]['color'] = node_colors[1]
+            G.nodes[a]['size'] = node_sizes[1]
+            G.nodes[a]['shape'] = node_shapes[0]
+        elif a in NodeES:
+            G.nodes[a]['color'] = node_colors[0]
+            G.nodes[a]['size'] = node_sizes[0]
+            G.nodes[a]['shape'] = node_shapes[1]
+        else:
+            G.nodes[a]['color'] = node_colors[2]
+            G.nodes[a]['size'] = node_sizes[0]
+            G.nodes[a]['shape'] = node_shapes[1]
+
+    G.add_edges_from(edgelistO)
+
+    #nx.draw(G, Positions)
+    nx.draw_networkx_edges(G, Positions, edge_color=edgelistC, width = edgelistW)
+    '''
+    for shape in set(node_shapes):
+        # the nodes with the desired shapes
+        node_list = [node for node in G.nodes() if G.nodes[node]['shape'] == shape]
+        nx.draw_networkx_nodes(G,Positions,
+                            nodelist = node_list,
+                            node_size = [G.nodes[node]['size'] for node in node_list],
+                            node_color= [G.nodes[node]['color'] for node in node_list],
+                            node_shape = shape)
+    '''
+
+    for shape in set(node_shapes):
+        # the nodes with the desired shapes
+        node_list = [node for node in G.nodes() if G.nodes[node]['shape'] == shape]
+        nx.draw_networkx_nodes(
+                                G,
+                                Positions,
+                                nodelist = node_list,
+                                node_size  = [G.nodes[node]['size'] for node in node_list],
+                                node_color = [G.nodes[node]['color'] for node in node_list],
+                                node_shape = shape
+                            )
+
+    plt.savefig(FNAMEI, dpi=1000)
+    plt.clf()
+    
+
+def Write_X_Only_Nodes(Input: InputStructure, Output: OutputStructure):
+
+    CurrectFolder = os.path.dirname(os.path.abspath(__file__))
+    GNNPICOUT = CurrectFolder + "/GNNPICOUT"
+    GNNINPUT = CurrectFolder + "/GNNINPUT"
+
+    if not os.path.isdir(GNNPICOUT):
+        os.mkdir(GNNPICOUT)
+
+    FNAMEI = GNNPICOUT + '/' + Input.Fname + '_N.png' #nodes
+    FNAMED = GNNINPUT + '/' + str(int(Input.Fname)+70000) + '.txt'
+
+
+    if os.path.isfile(FNAMEI):
+        os.remove(FNAMEI)
+
+    if os.path.isfile(FNAMED):
+        os.remove(FNAMED)
+
+    edgelistO = []
+    edgelistC = []
+    edgelistW = []
+    
+    edge_colors= ["#737373","#000000","#a9b0aa","#80d189","#ccbfbe","#ccbfbe","#ccbfbe"]
+
+
+    for i in range(Input.n-1):
+        for j in range(i+1,Input.n):
+            if Input.A[i][j] > 0.5 or Input.A[j][i] > 0.5: 
+                edgelistO.append((i,j))
+                edgelistC.append(edge_colors[0])
+                edgelistW.append(0.05)
+   
+
+    NodeES = set()
+    NodeEN = set()
+
+    for i in range(Input.n):
+        for j in range(Input.n):
+            if Output.X[i][j] > 0.5:
+                NodeES.update(set([i]))
+                NodeES.update(set([j]))
+            elif Input.A[i][j] > 0.5:
+                NodeEN.update(set([i]))
+                NodeEN.update(set([j]))
+    
+    NodeEN = NodeEN - NodeES
+
+    Positions = {}
+    
+    for x in range(Input.n):
+        Positions[x]=(Input.Pos[x][0],Input.Pos[x][1])
+
+    node_colors= ["#232ab8","#c26b29","#a9b0aa","#80d189","#ccbfbe","#ccbfbe","#ccbfbe"]
+    node_sizes = [0.1,0.2,0.3,9000,11000,13000,15000]
+    node_shapes = ['s', 'o']
+
+    G = nx.Graph()
+    G.add_nodes_from(Positions.keys())
+    for a,p in Positions.items():
+        G.nodes[a]['pos'] = p 
+        if a == Input.sr:
+            G.nodes[a]['color'] = node_colors[1]
+            G.nodes[a]['size'] = node_sizes[1]
+            G.nodes[a]['shape'] = node_shapes[0]
+        elif a in NodeES:
+            G.nodes[a]['color'] = node_colors[0]
+            G.nodes[a]['size'] = node_sizes[2]
+            G.nodes[a]['shape'] = node_shapes[1]
+        else:
+            G.nodes[a]['color'] = node_colors[2]
+            G.nodes[a]['size'] = node_sizes[0]
+            G.nodes[a]['shape'] = node_shapes[1]
+
+    G.add_edges_from(edgelistO)
+
+    #nx.draw(G, Positions)
+    nx.draw_networkx_edges(G, Positions, edge_color=edgelistC, width = edgelistW)
+    '''
+    for shape in set(node_shapes):
+        # the nodes with the desired shapes
+        node_list = [node for node in G.nodes() if G.nodes[node]['shape'] == shape]
+        nx.draw_networkx_nodes(G,Positions,
+                            nodelist = node_list,
+                            node_size = [G.nodes[node]['size'] for node in node_list],
+                            node_color= [G.nodes[node]['color'] for node in node_list],
+                            node_shape = shape)
+    '''
+
+    for shape in set(node_shapes):
+        # the nodes with the desired shapes
+        node_list = [node for node in G.nodes() if G.nodes[node]['shape'] == shape]
+        nx.draw_networkx_nodes(
+                                G,
+                                Positions,
+                                nodelist = node_list,
+                                node_size  = [G.nodes[node]['size'] for node in node_list],
+                                node_color = [G.nodes[node]['color'] for node in node_list],
+                                node_shape = shape
+                            )
+
+    plt.savefig(FNAMEI, dpi=1000)
+    plt.clf()
+    
+
+
 
 if __name__ == '__main__':
     #ExtactingNodes()

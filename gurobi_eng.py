@@ -13,15 +13,15 @@ from matrix import compare_matrix_g
 
 
 
-def Gurobi_Solve(InputData: InputStructure, Lazy = True, YUE: bool =False, Testing:bool =False, UndirectionalConstraint: bool =False):
+def Gurobi_Solve(InputData: InputStructure, Lazy = True, UndirectionalConstraint: bool =False):
 
     try:
-        #Data input
+        # Data input
         N = InputData.n
         Srow = InputData.sr
         Lmt = InputData.Lmt
 
-        #Data result
+        # Data result
         OutData = OutputStructure()
 
         # Create a new model
@@ -29,22 +29,17 @@ def Gurobi_Solve(InputData: InputStructure, Lazy = True, YUE: bool =False, Testi
     
         # Variables        
         x = m.addMVar(shape=(N,N), vtype=GRB.BINARY, name="x")
+        y = m.addMVar(shape=(N,N), vtype=GRB.INTEGER, lb=0, name="y")
         
         # Set objective
         obj = gp.QuadExpr()
         
         # Set quadratic part
-        cnt_negetive_trm = 0
         for Pindex in range(N):
             z = IndexMaker(N, Srow, Pindex)
 
             for i1,j1,i2,j2 in z:
-                obj.add(InputData.XTW[Pindex]*x[i1,j1]*x[i2,j2])
-
-            if InputData.XTW[Pindex] <= 0 and YUE != True and Testing == True:
-                cnt_negetive_trm = cnt_negetive_trm + 1
-                print("We have negative/zero coefficient in objective function!!")
-                exit(3355)
+                obj.add(InputData.XTW[Pindex]*y[i1][j1]*y[i2][j2])
 
         # Geting the number of quadratic term in objective function
         OutData.NQ =obj.size()
@@ -57,24 +52,24 @@ def Gurobi_Solve(InputData: InputStructure, Lazy = True, YUE: bool =False, Testi
         # Constraint (1)
         for i in range(N):
             for j in range(N):
-                m.addConstr(x[i][j] <= InputData.A[i][j])
+                m.addConstr(x[i][j]*InputData.A[i][j] == y[i][j])
 
 
-        #constraint (2)
+        # Constraint (2)
         if UndirectionalConstraint == True:
             for i in range(N-1):
                 for j in range(i+1, N):
                     m.addConstr(x[i][j] == x[j][i])
         
         
-        #constraint (3)
+        # Constraint (3)
         m.addConstr(gp.quicksum(x[i][j] for i in range(N) for j in range(N)) <= Lmt)
 
-        # lazy optimization parameters
+        # Lazy optimization parameters
         m.Params.LazyConstraints = 1
         m._var = x
 
-        # running the algorithm
+        # Running the algorithm
         begin = time.time()
         if Lazy == True:
             m.optimize(subtourelim)
@@ -82,76 +77,17 @@ def Gurobi_Solve(InputData: InputStructure, Lazy = True, YUE: bool =False, Testi
             m.optimize()
         end = time.time()
 
-        #OutData.ObjMO = 
+        # OutData.ObjMO = 
         OutData.Time = end-begin
         OutData.X = x.X
 
-
-        if Testing == True:
-
-            tmp_ObjMO = np.copy(OutData.X)
-            tmp_ObjGNN = np.copy(InputData.A)
-
-            if not compare_matrix_g(tmp_ObjGNN, tmp_ObjMO) and not YUE:
-                print("not compare_matrix_g(A)")
-                exit(22)
-            
-            tmp_ObjMO = tmp_ObjMO   @ tmp_ObjMO
-            tmp_ObjGNN = tmp_ObjGNN   @ tmp_ObjGNN
-            
-            if not compare_matrix_g(tmp_ObjGNN, tmp_ObjMO) and not YUE:
-                print("not compare_matrix_g(AA)")
-                exit(22)
-
-            tmp_ObjMO = tmp_ObjMO   @ InputData.X
-            tmp_ObjGNN = tmp_ObjGNN   @ InputData.X
-            
-            if not compare_matrix_g(tmp_ObjGNN,tmp_ObjMO) and not YUE:
-                print("not compare_matrix_g(AAX)")
-                exit(22)
-
-            tmp_ObjMO = tmp_ObjMO   @ InputData.Theta
-            tmp_ObjGNN = tmp_ObjGNN     @ InputData.Theta
-            if not compare_matrix_g(tmp_ObjGNN,tmp_ObjMO) and not YUE:
-                print("not compare_matrix_g(AAXT)")
-                exit(22)
-
-            tmp_ObjMO = tmp_ObjMO[InputData.sr,:]
-            tmp_ObjGNN= tmp_ObjGNN[InputData.sr,:]
-            if not compare_matrix_g(tmp_ObjGNN,tmp_ObjMO) and not YUE:
-                print("not compare_matrix_g(AAXTR)")
-                exit(22)
-
-            tmp_ObjMO = tmp_ObjMO   @ InputData.tmp_sum
-            tmp_ObjGNN = tmp_ObjGNN   @ InputData.tmp_sum
-            
-            if tmp_ObjMO > tmp_ObjGNN and not YUE:
-                print("tmp_ObjMO > tmp_ObjGNN")
-                exit(11)
-        
-            OutData.ObjMO = tmp_ObjMO
-
-        else:
-
-            tmp_ObjMO = np.copy(OutData.X)
-            tmp_ObjGNN = np.copy(InputData.A)
-
-            tmp_ObjMO = tmp_ObjMO   @ tmp_ObjMO
-            tmp_ObjGNN = tmp_ObjGNN   @ tmp_ObjGNN
-        
-            tmp_ObjMO = tmp_ObjMO   @ InputData.X
-            tmp_ObjGNN = tmp_ObjGNN   @ InputData.X
-            
-            tmp_ObjMO = tmp_ObjMO   @ InputData.Theta
-            tmp_ObjGNN = tmp_ObjGNN     @ InputData.Theta
-
-            tmp_ObjMO = tmp_ObjMO[InputData.sr,:]
-            tmp_ObjGNN= tmp_ObjGNN[InputData.sr,:]
-            
-            tmp_ObjMO = tmp_ObjMO   @ InputData.tmp_sum
-            tmp_ObjGNN = tmp_ObjGNN   @ InputData.tmp_sum
-            
-            OutData.ObjMO = tmp_ObjMO
+        tmp_ObjMO = np.copy(OutData.X)
+        tmp_ObjMO = tmp_ObjMO   @ tmp_ObjMO
+        tmp_ObjMO = tmp_ObjMO   @ InputData.X
+        tmp_ObjMO = tmp_ObjMO   @ InputData.Theta
+        tmp_ObjMO = tmp_ObjMO[InputData.sr,:]
+        tmp_ObjMO = tmp_ObjMO   @ InputData.tmp_sum
+        OutData.ObjMO = tmp_ObjMO
 
         OutData.Obj = m.objVal
 
