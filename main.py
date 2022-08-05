@@ -49,6 +49,10 @@ def RunWithOld():
         Draw_Picture(InputDt, ResultDt, WithOld=True)
 
 
+
+#pems-bay-K=5-directed-A 900004
+#metr-la-K=5-directed-A 900005
+
 def RunRealData():
 
     St = 900003
