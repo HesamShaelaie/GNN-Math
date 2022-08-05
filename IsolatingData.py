@@ -161,7 +161,7 @@ def ExtactingNodes_YUE():
         
         Draw_Graph_O(InputDt)
         Draw_Graph_K(InputDt)
-        InputDt.Lmt = 654
+        InputDt.Lmt = 2
 
         #ResultDt = Gurobi_Solve(InputDt, Lazy= False, YUE= False, UndirectionalConstraint=True, Testing= True)
         ResultDt = Gurobi_Solve(InputDt, Lazy= False, UndirectionalConstraint=False)
@@ -175,7 +175,10 @@ def ExtactingNodes_YUE():
 
         print("CntX= %d"%ResultDt.CntX)
         #DrawOnMap(InputDt, ResultDt, WithKTwo= True)
-        Write_Draw(InputDt, ResultDt)
+        
+        Write_X_Endg_Nodes(InputDt, ResultDt)
+        #Sepreate_Data(InputDt, ResultDt)
+
         Write_Result(InputDt, ResultDt)
 
 
@@ -259,8 +262,6 @@ def FindMaxNeighbours(InputDt: InputStructure):
 
     print("Max neightbours belong to Hub (%d) with (%d) neighbours at K=%d "%(IndexR, Max, k))
     
-
-
 
 
 if __name__ == '__main__':
