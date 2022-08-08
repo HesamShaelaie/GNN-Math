@@ -22,7 +22,7 @@ from draw_graphs import DrawBasedOnA
 from draw_graphs import Write_X_Only_Nodes
 from draw_graphs import Write_X_Endg_Nodes
 from extract_NodeEdges import Write_Node_Edges
-
+from extract_NodeEdges import Write_Node_Edges_Only
 
 import os
 from data_structures import OutputStructure
@@ -185,6 +185,7 @@ def ExtactingNodes_YUE():
         Write_Result(InputDt, ResultDt)
 
         Write_Node_Edges(InputDt, ResultDt)
+        Write_Node_Edges_Only(InputDt, ResultDt)
 
 
 def Somecheckings(InputDt: InputStructure):
