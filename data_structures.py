@@ -54,10 +54,12 @@ class InputStructure():
         self.Path = Path
         self.Fname = Fname
         self.Pos = P
+        self.PosID = {}
 
         self.OriginalA = np.empty
         self.OA = np.empty
         self.OP = {}
+        self.ID = np.empty
         self.LN = np.empty
         self.On = -1
         self.K = -1 
@@ -88,6 +90,9 @@ class InputStructure():
 
     def reset_T(self):
         self.Theta = np.copy(self.CopyTheta)
+
+    def GetID(self, PID):
+        self.PosID = PID
 
     #defualt value of the K is 2 as we got it from the original model
     def recalculate(self, K: int = 1, Rho: int = 1, ResetLimit:bool = True, WithAdjustment:bool = True):

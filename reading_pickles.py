@@ -8,7 +8,7 @@ from data_structures import OutputStructure
 
 #{'A':engine.model.A, 'A_POW':engine.model.A_pow, 'X': dataloader['val_loader'].xs,  'T':engine.model.theta, 'R':0, 'L':0, 'lat': engine.model.lat, 'lng': engine.model.lng}
 
-def read_data(Index, INCLUDE_OLD = False, YUE=False):
+def read_data(Index, INCLUDE_OLD = False, YUE=False, INCLUDE_ID = False):
     
     CurrectFolder = os.path.dirname(os.path.abspath(__file__))
     GNNINPUT = CurrectFolder + "/GNNINPUT/"
@@ -37,12 +37,14 @@ def read_data(Index, INCLUDE_OLD = False, YUE=False):
     lat = empty
 
     P = {}
-
+    P_ID = {}
     if YUE == True:
         lng = Info['lng']
         lat = Info['lat']
-        for i, (lh, lw) in enumerate(zip(lat, lng)):
+        IDD = Info['sensor_id']
+        for i, (lh, lw, ld) in enumerate(zip(lat, lng, IDD)):
             P.update({i:[lh,lw]})
+            P_ID.update({i:[lh,lw,ld]})
     
         tmpA = np.shape(A)[0]
         CntAm = 0
@@ -75,10 +77,14 @@ def read_data(Index, INCLUDE_OLD = False, YUE=False):
 
     InputDt = InputStructure(Index, path_to_file, Fname, A, X, T, R, L, P)
 
+    if INCLUDE_ID:
+        InputDt.GetID(P_ID)
+
     if INCLUDE_OLD:
         InputDt.getting_old(OA= Info['OA'], OP= Info['OP'], LN=Info['LN'], OriginalA=Info['ORGA'])
 
     return InputDt
+
 
 if __name__ == '__main__':
     InputDt = read_data(254, INCLUDE_OLD = False, YUE = False)

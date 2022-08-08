@@ -21,6 +21,7 @@ from draw_graphs import DrawOnMap
 from draw_graphs import DrawBasedOnA
 from draw_graphs import Write_X_Only_Nodes
 from draw_graphs import Write_X_Endg_Nodes
+from extract_NodeEdges import Write_Node_Edges
 
 
 import os
@@ -131,12 +132,12 @@ def Sepreate_Data(Input: InputStructure, Output: OutputStructure):
 def ExtactingNodes_YUE():
     
     BlackOut = False
-    St = 900004
-    Ed = 900005
+    St = 900006
+    Ed = 900007
 
     for x in range(St, Ed):
 
-        InputDt = read_data(x, INCLUDE_OLD=False, YUE=True)
+        InputDt = read_data(x, INCLUDE_OLD=False, YUE=True, INCLUDE_ID=True)
         
 
         if BlackOut:
@@ -161,12 +162,14 @@ def ExtactingNodes_YUE():
         
         Draw_Graph_O(InputDt)
         Draw_Graph_K(InputDt)
-        InputDt.Lmt = 2
+        InputDt.Lmt = 5
 
         #ResultDt = Gurobi_Solve(InputDt, Lazy= False, YUE= False, UndirectionalConstraint=True, Testing= True)
         ResultDt = Gurobi_Solve(InputDt, Lazy= False, UndirectionalConstraint=False)
 
         Write_X_Only_Nodes(InputDt, ResultDt)
+        
+
 
         if BlackOut:
             InputDt.reset_X()
@@ -180,6 +183,8 @@ def ExtactingNodes_YUE():
         #Sepreate_Data(InputDt, ResultDt)
 
         Write_Result(InputDt, ResultDt)
+
+        Write_Node_Edges(InputDt, ResultDt)
 
 
 def Somecheckings(InputDt: InputStructure):

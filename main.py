@@ -52,6 +52,7 @@ def RunWithOld():
 
 #pems-bay-K=5-directed-A 900004
 #metr-la-K=5-directed-A 900005
+#pems-bay-K=5-directed-A-sensor-id 900006
 
 def RunRealData():
 
