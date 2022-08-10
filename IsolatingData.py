@@ -3,6 +3,7 @@ from turtle import color
 from reading_pickles import InputStructure
 from reading_pickles import read_data
 from gurobi_eng import Gurobi_Solve
+from gurobi_eng import Gurobi_SecondObj
 import pylab
 import os
 import pickle
@@ -145,7 +146,7 @@ def ExtactingNodes_YUE():
             InputDt.blank_T()
 
         #Somecheckings(InputDt)
-        
+        InputDt.A = np.transpose(np.copy(InputDt.CopyA))
         InputDt.recalculate(K=5, Rho=3, ResetLimit=True, WithAdjustment=True)
 
         #SecondaryCheck(InputDt)
@@ -165,11 +166,10 @@ def ExtactingNodes_YUE():
         InputDt.Lmt = 5
 
         #ResultDt = Gurobi_Solve(InputDt, Lazy= False, YUE= False, UndirectionalConstraint=True, Testing= True)
-        ResultDt = Gurobi_Solve(InputDt, Lazy= False, UndirectionalConstraint=False)
-
-        Write_X_Only_Nodes(InputDt, ResultDt)
+        #ResultDt = Gurobi_Solve(InputDt, Lazy= False, UndirectionalConstraint=False)
+        ResultDt = Gurobi_SecondObj(InputDt, Lazy= False, UndirectionalConstraint=False)
         
-
+        Write_X_Only_Nodes(InputDt, ResultDt)
 
         if BlackOut:
             InputDt.reset_X()
@@ -268,7 +268,6 @@ def FindMaxNeighbours(InputDt: InputStructure):
 
     print("Max neightbours belong to Hub (%d) with (%d) neighbours at K=%d "%(IndexR, Max, k))
     
-
 
 if __name__ == '__main__':
     #ExtactingNodes()

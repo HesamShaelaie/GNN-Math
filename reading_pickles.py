@@ -87,22 +87,12 @@ def read_data(Index, INCLUDE_OLD = False, YUE=False, INCLUDE_ID = False):
 
 
 if __name__ == '__main__':
-    InputDt = read_data(254, INCLUDE_OLD = False, YUE = False)
+    InputDt = read_data(900006, INCLUDE_OLD = False, YUE = True)
 
-    CntA = 0
-    CntB = 0
-    for x in range(InputDt.n):
-        for y in range(InputDt.n):
-            if InputDt.A[x][y]>0.5:
-                CntA = CntA + 1
+    print(InputDt.Theta)
+    print(np.shape(InputDt.X))
+    print(InputDt.X)
     
-    for x in range(InputDt.n):
-        for y in range(InputDt.n):
-            if InputDt.A[x, y]>0.5:
-                CntB = CntB + 1
-    
-    print(CntA)
-    print(CntB)
 
     #InputDt.show()
 
